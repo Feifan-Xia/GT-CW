@@ -4,7 +4,7 @@
 
 ## Abstract
 
-We study the minority game in the context of urban commuting, where 101 workers independently decide each morning whether to drive or use alternative transport. We derive the unique symmetric mixed Nash equilibrium ($p^* \approx 0.62$, expected attendance $\approx 62.6$, above the capacity threshold $T=60$) and show that it is Pareto-dominated by the reachable social optimum by a factor of 2.4. Myopic best-reply dynamics collapse into a two-period oscillation. An inductive-agent model following Arthur (1994), featuring 11 heterogeneous predictors including two novel commuter-psychology-motivated rules, reproduces Arthur's convergence to the threshold ($\bar{A} \approx 56 \approx T$) with mean payoff $\approx 0.30$--$0.32$, consistently above the best-reply baseline and the mixed NE welfare benchmark. Ablation and exploration-sensitivity experiments confirm the contributions of predictor diversity and stochastic exploration.
+We study the minority game in the context of urban commuting, where 101 workers independently decide each morning whether to drive or use alternative transport. We derive the unique symmetric mixed Nash equilibrium ($p^* \approx 0.62$, expected attendance $\approx 62.6$, above the capacity threshold $T=60$) and show that it is Pareto-dominated by the reachable social optimum by a factor of 2.4. Stage-game best-reply dynamics collapse into a two-period oscillation. An inductive-agent model following Arthur (1994), featuring 11 heterogeneous predictors including two novel commuter-psychology-motivated rules, reduces congestion from 65% (mixed NE) to approximately 46% with mean per-agent payoff in the range $[0.29, 0.32]$ across seeds, on average marginally above the mixed NE benchmark of $0.30$. Ablation and exploration-sensitivity experiments quantify the contributions of predictor diversity and stochastic exploration.
 
 ---
 
@@ -28,11 +28,13 @@ $$r_i(s_i, \mathbf{s}_{-i}) = \begin{cases} 1 & \text{if } s_i = \textit{drive} 
 
 The payoff $r_{\text{transit}} = 0.3$ reflects the reliable but modest utility of public transport. Driving strictly dominates transit *if and only if* the road is uncongested, creating the minority-game tension.
 
-**Information structure:** The game is simultaneous; players choose without observing others' decisions. After each round, public attendance $A_t$ is announced. This public signal is the only feedback available to all players, which is why predictive strategies rather than purely reactive ones are necessary for sustained coordination.
+**Information structure:** The game is simultaneous; players choose without observing others' decisions. After each round, public attendance $A_t$ is announced. This public signal is the only feedback available to all players, which motivates predictive rather than purely reactive strategies for sustained coordination.
 
 ### 1.3 Repeated Game
 
-The stage game $G$ is repeated for $m = 200$ rounds. Let $h^t = (A_1, \ldots, A_{t-1}) \in \mathbb{R}^{t-1}$ denote the public history at round $t$, and $H = \bigcup_{t \geq 1} \mathbb{R}^{t-1}$ the set of all histories. A **strategy** is a mapping $\sigma_i : H \rightarrow S_i$ from histories to actions. The cumulative payoff is $\Pi_i = \sum_{t=1}^{m} r_i^{(t)}$. Since rounds are independent given a fixed strategy profile, maximising $\Pi_i$ is equivalent to maximising the expected per-round payoff $\mathbb{E}[r_i^{(t)}]$. This equivalence motivates comparing adaptive performance to the static mixed NE as a benchmark.
+The stage game $G$ is repeated for $m = 200$ rounds. Let $h^t = (A_1, \ldots, A_{t-1}) \in \mathbb{R}^{t-1}$ denote the public history at round $t$, and $H = \bigcup_{t \geq 1} \mathbb{R}^{t-1}$ the set of all histories. A **strategy** is a mapping $\sigma_i : H \rightarrow S_i$ from histories to actions. The cumulative payoff is $\Pi_i = \sum_{t=1}^{m} r_i^{(t)}$.
+
+For agents using fixed strategies (such as always driving, always using transit, or randomising at $p^*$), rounds are independent conditional on the history, so $\Pi_i$ reduces to $m \cdot \mathbb{E}[r_i^{(t)}]$. For adaptive agents such as those in Section 4.2, whose strategy profiles change as predictor scores are updated, this reduction does not hold exactly -- but per-round expected payoff remains the natural performance metric and enables direct comparison against the static mixed NE benchmark.
 
 ---
 
@@ -52,7 +54,7 @@ Any configuration with exactly $T = 60$ drivers is a NE:
 - Each driver earns $1$ (since $A = 60 \leq T$). Switching to transit gives $0.3 < 1$. No incentive to deviate.
 - Each transit user earns $0.3$. Switching to driving yields $A = 61 > T$, earning $0 < 0.3$. No incentive to deviate.
 
-There are $\binom{101}{60}$ such equilibria, an astronomically large uncoordinated set. In the urban commuting context, reaching one would require exactly 60 specific workers to pre-agree on driving while the rest use transit, a coordination mechanism the model does not provide.
+There are $\binom{101}{60}$ such equilibria, an astronomically large uncoordinated set. In the urban commuting context, reaching one would require exactly 60 specific workers to pre-agree on driving while the rest use transit, a mechanism the model does not provide.
 
 *Note on refinements:* The symmetric mixed NE (Section 2.2) is the unique symmetric equilibrium concept; trembling-hand perturbations cannot select among the asymmetric pure NE without a coordination device. For finite repetition, the folk theorem does not apply when the stage game lacks a unique NE payoff profile, so sustained cooperation above the mixed NE level is not theoretically guaranteed.
 
@@ -66,22 +68,24 @@ Since $P(\text{Bin}(100, p) \leq 59)$ is **strictly decreasing** in $p$, the equ
 
 $$p^* \approx 0.6202, \qquad Np^* \approx 62.6 > T = 60$$
 
-At $p^*$, expected attendance exceeds the threshold. This is not paradoxical: indifference is achieved when a marginal driver faces exactly a 30% chance of an uncongested road -- consistent with mean attendance slightly above capacity, because the binomial variance ($\sigma = \sqrt{Np^*(1-p^*)} \approx 4.9$) keeps the probability of $A \leq 60$ at 35% even when $\mathbb{E}[A] = 62.6$. The overall congestion rate is $P(A > 60) \approx 65\%$, confirmed empirically at 65.4%.
+At $p^*$, expected attendance exceeds the threshold. This is not paradoxical: indifference is achieved when a marginal driver faces exactly a 30% chance of an uncongested road -- consistent with mean attendance slightly above capacity, because the binomial variance ($\sigma = \sqrt{Np^*(1-p^*)} \approx 4.9$) keeps the probability of $A \leq 60$ at 35% even when $\mathbb{E}[A] = 62.6$. The congestion rate is $P(A > 60) \approx 65\%$, confirmed empirically at 65.4%.
 
 ### 2.3 Welfare Analysis
 
-The mixed NE is Pareto-inefficient. At the indifference condition, every player earns exactly $r_{\text{transit}} = 0.3$, identical to choosing transit at every round.
+The mixed NE is Pareto-inefficient. At the indifference condition, every player earns exactly $r_{\text{transit}} = 0.3$, the same as choosing transit at every round.
 
 | Outcome | Mean attendance | Per-agent payoff | Total welfare |
 |---------|----------------|-----------------|---------------|
 | All transit | 0 | 0.300 | 30.3 |
 | Mixed NE ($p^* = 0.62$) | 62.6 | **0.300** | **30.3** |
 | Inductive agents (simulated) | ~56 | ~0.306 | ~30.9 |
-| Social optimum = Asymm. NE ($A=60$) | 60 | **0.709** | **71.6** |
+| Social optimum = Asymm. NE ($A=60$) | 60 | **0.716** | **72.3** |
 
-The social optimum coincides with any asymmetric pure NE with exactly $T=60$ drivers: total welfare $= 60 \times 1 + 41 \times 0.3 = 71.6$, or $0.709$ per agent, **2.4 times the mixed NE welfare**. The mixed NE represents a coordination failure: each commuter rationally accounts for others' independence, and the collective result is that the road is congested nearly two-thirds of the time despite all players earning only $0.3$.
+The social optimum coincides with any asymmetric pure NE with exactly $T=60$ drivers: total welfare $= 60 \times 1 + 41 \times 0.3 = 72.3$, or $0.716$ per agent, **2.4 times the mixed NE welfare**. The mixed NE represents a coordination failure: each commuter rationally accounts for others' independence, and the collective result is that the road is congested nearly two-thirds of the time despite all players earning only $0.3$.
 
 In real commuting terms: a city that can direct exactly 60 daily drivers through pricing, reservations, or a permit scheme attains welfare equal to the social optimum. Without such a mechanism, rational independent play achieves the same welfare as universal transit use.
+
+**Connection to the repeated game.** One might expect repeated play to drive agents toward the symmetric mixed NE or even toward an efficient asymmetric NE. Section 4 shows neither happens under homogeneous reactive strategies. The mixed NE is an equilibrium of beliefs, not a dynamical attractor; and the asymmetric NE requires coordination that the single public signal $A_t$ cannot provide. This motivates the inductive approach, which achieves coordination near $T$ through predictor diversity rather than equilibrium reasoning.
 
 ---
 
@@ -107,26 +111,28 @@ Even if every commuter knew $p^*$ and played it, congestion would occur on two o
 
 ## 4. Repeated Game Dynamics
 
-### 4.1 Myopic Best-Reply as Baseline
+### 4.1 Stage-Game Best-Reply Dynamics
 
-Before inductive strategies, we study the simplest adaptive rule: **myopic best-reply agents** who apply the stage-game best response to last period's realised attendance.
+Before inductive strategies, we study the simplest adaptive rule: agents who apply the **stage-game best response to the previous round's realised attendance**, updating their choice each period without accounting for others' reasoning or the game's repeated structure.
 
 **Rule:** if $A_{t-1} \leq T$ (road uncongested) $\Rightarrow$ drive; if $A_{t-1} > T$ (road congested) $\Rightarrow$ transit.
 
-*Note on terminology:* This is a **myopic best-reply to the previous realisation**, not a game-theoretic best response (which would require a belief distribution over co-players' actions in the current round). The distinction matters: a true best response could involve a mixed strategy, while this rule is purely reactive.
+Note that this constitutes a best response to the *previous* period's outcome, not a best response in the repeated-game sense (which would require a belief distribution over co-players' current actions and acknowledgment of future consequences). The distinction matters: true best-reply reasoning in the repeated game could involve a fixed or mixed per-round strategy, while this rule is purely reactive to the last observation.
 
 **Round-1 initialisation:** Agents perceive a prior attendance of $T = 60$ (uncongested), so all 101 drive in round 1 ($A_1 = 101 > T$). All switch to transit in round 2 ($A_2 = 0 \leq T$). All drive again in round 3. The result is the permanent two-period oscillation shown in **Figure 3**: attendance alternates between 0 and 101, never approaching $T$ or $Np^*$.
 
 ![Figure 3](figure3_best_response.png)
-*Figure 3: Myopic best-reply -- permanent 0--101 oscillation. Mean payoff $= (0.3 + 0)/2 = 0.15$, below the transit-only payoff.*
+*Figure 3: Stage-game best-reply -- permanent 0--101 oscillation. Mean payoff $= (0.3 + 0)/2 = 0.15$, below the transit-only payoff.*
 
-This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of what any fixed strategy achieves. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle.
+This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of what any fixed strategy achieves. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
 
-For commuting applications: a navigation system that broadcasts a single uniform "drive/transit" recommendation to all users would replicate this failure. Universal adoption of any single reactive rule on a heavily used road network should produce this oscillatory pattern, consistent with periodic wave-like congestion documented on instrumented ring roads.
+For commuting applications: a navigation system that broadcasts a single uniform recommendation to all users would replicate this failure. Universal adoption of a single reactive rule on a heavily used road creates the oscillatory pattern qualitatively consistent with periodic flow waves observed on instrumented ring roads.
 
 ### 4.2 Inductive Strategies
 
-Following Arthur (1994), agents replace reactive rules with **inductive predictors**: internal models of next-period attendance, updated continuously by prediction accuracy. Each agent $i$ holds $K=6$ predictors drawn at random at initialisation from a global pool of 11, ensuring **heterogeneity by construction** and preventing the synchronisation that causes myopic best-reply to fail.
+Following Arthur (1994), agents replace reactive rules with **inductive predictors**: internal models of next-period attendance, updated continuously by prediction accuracy. Each agent $i$ holds $K=6$ predictors drawn at random at initialisation from a global pool of 11, ensuring **heterogeneity by construction** and preventing the synchronisation that causes stage-game best-reply to fail.
+
+**Implementation note.** Before round 1, each agent's history is seeded with 10 warmup observations drawn uniformly from $\{50, \ldots, 71\}$ to initialise predictor scores. These warmup rounds are not counted in the M=200 simulation rounds.
 
 **Predictor pool:**
 
@@ -135,49 +141,49 @@ Following Arthur (1994), agents replace reactive rules with **inductive predicto
 | last | $A_{t-1}$ | Yesterday repeats |
 | avg-$n$ ($n \in \{3,5,7\}$) | $\bar{A}_{t-n:t}$ | Inertia of recent flow |
 | contrarian | $2T - A_{t-1}$ | Oscillation half-period |
-| trend | $A_{t-1} + \Delta A_{t-1}$, clipped | Momentum extrapolation |
+| trend | $A_{t-1} + \Delta A_{t-1}$, clipped to $[0,N]$ | Momentum extrapolation |
 | **cong-mom** *(novel)* | $A_{t-1} + 0.5(T{-}A_{t-1})$ if $A_{t-1}{>}T$, else $A_{t-1}$ | Partial recovery after congestion |
 | **thresh-prox** *(novel)* | $T + 0.5(A_{t-1}{-}T)$ | Mean-reversion toward capacity |
 | cycle-$k$ ($k \in \{2,3,5\}$) | $A_{t-k}$ | Periodic pattern detection |
 
-The two novel predictors model commuter psychology absent from Arthur's original pool. *Congestion momentum* captures a driver who, having experienced a jam, expects partial rather than full recovery -- a response consistent with commuter loss-aversion. *Threshold-proximity* captures the belief that attendance gravitates toward road capacity, a mean-reversion hypothesis.
+A key **coverage condition** (Arthur 1994): the pool must span both sides of $T$ so that each round some agents are directed to drive and others to transit. Contrarian, cycle-$k$, avg-$n$, and thresh-prox produce a distribution of forecasts on both sides of $T$ depending on history, preventing systematic bias.
 
-A key **coverage condition** (Arthur 1994): the pool must include predictors forecasting both above and below $T$, so that each round some agents are directed to drive and others to use transit. The pool satisfies this: contrarian, thresh-prox, and moving-average predictors span a range surrounding $T$, ensuring no systematic bias toward all-drive or all-transit.
+**On the contribution of the novel predictors.** The two novel predictors share an important property: when $A_{t-1} < T$, both thresh-prox and cong-mom forecast at or below $T$, directing agents to drive -- the same binary decision as `last'. When $A_{t-1} > T$, both forecast above $T$, directing agents to transit, again the same as `last'. The novel predictors therefore do not extend the action space. Their contribution is to **forecast calibration**: by predicting a value between $A_{t-1}$ and $T$ rather than $A_{t-1}$ itself, they fall within the accuracy window $\delta=5$ more often when attendance reverts toward threshold. Thresh-prox in particular -- forecasting the midpoint $\frac{1}{2}(A_{t-1}+T)$ -- is systematically more accurate than `last' when attendance moves toward capacity, earning higher score updates and accumulating a dominant position in the population. Cong-mom offers an analogous calibration advantage but only for the supra-threshold case; its marginal contribution is therefore much smaller (Section 5.2).
 
-**Score update:** Predictor accuracy is tracked via exponential smoothing:
+**Score update:** Each predictor's accuracy is tracked via exponential smoothing:
 
 $$\text{score}_d(t) = \gamma \cdot \text{score}_d(t{-}1) + \mathbf{1}\!\left[|\hat{A}_{d,t} - A_t| < \delta\right], \quad \gamma = 0.9,\; \delta = 5$$
 
-The agent follows the highest-scoring predictor, with exploration probability $\varepsilon = 0.05$. The decision threshold is $T$ (public knowledge -- road capacity is posted):
+This update uses the forecasts from the most recent non-exploration round; during $\varepsilon$-exploration rounds the scores are updated but the active forecast is not refreshed. The agent follows the highest-scoring predictor, with exploration probability $\varepsilon = 0.05$. The decision threshold is $T$ (public knowledge -- road capacity is posted):
 
 $$s_i(t) = \begin{cases} \textit{drive} & \text{if } \hat{A}_t \leq T \\ \textit{transit} & \text{otherwise} \end{cases}$$
 
 ### 4.3 Simulation Results
 
-**Convergence near threshold (Figure 4).** Consistent with Arthur's (1994) prediction that mean attendance converges to $T$, our simulation yields $\bar{A} \approx 56$ across seeds 42, 123, and 7 ($\pm 0.7$), close to $T = 60$ and well below $Np^* = 62.6$. The rolling mean stabilises by approximately round 30. Congestion rate: **45--48%**, compared to 65.4% at the mixed NE.
+**Convergence near threshold (Figure 4).** Consistent with Arthur's (1994) finding that mean attendance converges to $T$, our simulation yields $\bar{A} \approx 56$ across seeds 42, 123, and 7 ($\pm 0.7$), below but near $T = 60$ and substantially below $Np^* = 62.6$. The rolling mean stabilises by approximately round 30 (counting from after the warmup period). Congestion rate: **45--48%**, compared to 65.4% at the mixed NE.
 
 ![Figure 4](figure4_inductive_attendance.png)
-*Figure 4: Inductive agents -- attendance converges near $T=60$, consistently below $Np^*$, within approximately 30 rounds.*
+*Figure 4: Inductive agents -- attendance stabilises near but below $T=60$, well below $Np^*$, within approximately 30 rounds.*
 
-Convergence arises not from agents computing $p^*$, but from the **composition of active predictors** directing aggregate demand toward capacity. Approximately 60% of active predictors forecast below $T$ (directing agents to drive) and 40% above (directing agents to transit), yielding near-threshold aggregate behaviour, a distributed implementation of Arthur's inductive-reasoning insight.
+Convergence is not the result of agents computing $p^*$. Rather, the **composition of active predictors** determines the aggregate drive fraction: those directing agents to drive win score points when attendance is below $T$, increasing $A$ toward $T$; once above $T$, predictors directing agents to transit win points, lowering $A$ again. The mean drive fraction in steady state is approximately $\bar{A}/N \approx 55\%$, which is slightly below $T/N \approx 59\%$, consistent with the mean attendance being slightly below $T$.
 
-**Predictor composition (Figure 5).** The active predictor distribution shifts over time: avg-7 and thresh-prox dominate in the converged steady state (each approximately 23% share), with cycle-2 at 13%, reflecting the residual short-period oscillations visible in Figure 4. The trend predictor is eliminated (0% share) as it systematically overestimates momentum and is outcompeted. The novel predictors achieve 3% (cong-mom) and 23% (thresh-prox) steady-state share; thresh-prox becomes a dominant predictor, confirming its relevance to the commuting setting.
+**Predictor composition (Figure 5).** The active predictor distribution shifts over time: avg-7 and thresh-prox dominate in the converged steady state (each approximately 23% share), with cycle-2 at 13%, reflecting the residual short-period oscillations visible in Figure 4. The trend predictor is eliminated (0% share) as it systematically overestimates momentum and is outcompeted across all history conditions. The novel thresh-prox achieves 23% steady-state share, confirming its relevance in the commuting setting; cong-mom reaches only 3%, consistent with its narrower calibration advantage (Section 4.2).
 
 ![Figure 5](figure5_predictor_ecology.png)
 *Figure 5: Active predictor composition -- trend predictor eliminated; thresh-prox and avg-7 dominate at convergence.*
 
-**Payoff comparison (Figure 6).** Cumulative average payoffs across the three populations:
+**Payoff comparison (Figure 6).** **Figure 6** plots cumulative average payoff for the three populations, with the inductive line showing the mean across three seeds (shaded band: $\pm 1\sigma$). In steady state:
 
-- Myopic best-reply: converges to $0.150$ (oscillatory anti-coordination regime)
-- Uncorrelated random play at $p^*$: converges to $\approx 0.300$ (indifference condition, consistent with theory)
-- Inductive (average across seeds): $\approx 0.306 > 0.300$
+- Stage-game best-reply: $0.150$ (oscillatory anti-coordination regime)
+- Uncorrelated random play at $p^*$: $\approx 0.300$ (mixed NE, as expected from the indifference condition)
+- Inductive (mean across seeds 42, 123, 7): $\approx 0.306$
 
-Inductive agents marginally but consistently outperform the mixed NE payoff benchmark. The principal advantage over the mixed NE is not raw payoff -- which is nearly identical -- but **reduced congestion rate** (46% vs 65%) and lower variance in individual outcomes.
+Individual seed payoffs are [0.294, 0.300, 0.323], with seed 42 being the only seed that falls marginally below the 0.300 benchmark. The cross-seed mean exceeds the benchmark; results are not uniformly above it. The principal advantage of inductive agents over uncorrelated random play is not the raw payoff difference -- which is small -- but the **reduced congestion rate** (46% vs 65%) and lower variance in individual outcomes.
 
 ![Figure 6](figure6_payoff_comparison.png)
-*Figure 6: Cumulative payoff -- inductive $>$ uncorrelated $p^*$ $\gg$ myopic best-reply.*
+*Figure 6: Cumulative payoff -- inductive (mean $\pm 1\sigma$ across 3 seeds) vs uncorrelated $p^*$ vs stage-game best-reply.*
 
-**Individual payoff heterogeneity.** Tracking per-agent payoffs (seed 42): mean = 0.294, std = 0.021, range [0.243, 0.341]. The 37% spread between the best and worst agents reflects the composition of each agent's predictor subset: agents randomly assigned higher-performing predictors (particularly thresh-prox and avg-7) consistently earn more. This within-population payoff inequality is an emergent property absent from the symmetric mixed NE, where all players are treated as identical by construction.
+**Individual payoff heterogeneity.** Tracking per-agent payoffs (seed 42): mean = 0.294, std = 0.021, range [0.243, 0.341]. The 37% spread between the best and worst agents reflects the composition of each agent's predictor subset: agents randomly assigned higher-performing predictors (particularly thresh-prox and avg-7) consistently earn more. This within-population payoff inequality is an emergent consequence of random predictor assignment, absent from the symmetric mixed NE in which all players are treated identically.
 
 ---
 
@@ -193,19 +199,20 @@ Setting $\varepsilon = 0$ (pure exploitation, no stochastic exploration):
 | 123 | 0.300 | 0.259 | $-13.7\%$ |
 | 7 | 0.323 | 0.252 | $-22.0\%$ |
 
-Without exploration, agents lock into their initial best predictor early and cannot adapt as others' behaviour shifts around them. Payoff declines consistently across seeds (average $-15\%$). A small degree of stochastic deviation from the current best rule (5% random action rate) is necessary for sustained near-threshold coordination.
+Without exploration, agents lock into their initial best predictor early and cannot adapt as the predictor landscape shifts around them. Payoff declines consistently across seeds (average $-15\%$). A small degree of stochastic deviation from the current best rule (5% random action rate) is necessary for sustained near-threshold coordination.
 
 ### 5.2 Contribution of Novel Predictors (Ablation)
 
-Removing cong-mom and thresh-prox from the pool (redistributing $K=6$ draws from the remaining 9):
+The table below shows the effect of removing each novel predictor individually and jointly. To isolate contribution from reduction in pool size, we note that removing one predictor from 11 still leaves abundant combinatorial diversity ($\binom{10}{6} = 210$ vs $\binom{11}{6} = 462$ distinct agent subsets).
 
-| Seed | Full pool mean payoff | Ablated mean payoff | Change |
-|------|----------------------|---------------------|--------|
-| 42 | 0.294 | 0.249 | $-15.3\%$ |
-| 123 | 0.300 | 0.271 | $-9.7\%$ |
-| 7 | 0.323 | 0.260 | $-19.5\%$ |
+| Condition | Seed 42 | Seed 123 | Seed 7 | Mean | $\Delta$ vs full |
+|-----------|---------|----------|--------|------|-----------------|
+| Full pool | 0.294 | 0.300 | 0.323 | 0.306 | -- |
+| Remove thresh-prox only | 0.293 | 0.300 | 0.271 | 0.288 | $-5.9\%$ |
+| Remove cong-mom only | 0.314 | 0.306 | 0.289 | 0.303 | $-1.0\%$ |
+| Remove both | 0.249 | 0.271 | 0.260 | 0.260 | $-15.0\%$ |
 
-The novel predictors improve mean payoff by approximately 15% on average. Since thresh-prox is among the dominant active predictors at convergence (23% share), this result is expected: removing a high-performance predictor from the pool reduces the ceiling of achievable collective coordination.
+The results clarify the individual contributions: thresh-prox accounts for most of the ablation effect (predominantly at seed 7, $-16\%$), while cong-mom's marginal contribution is small ($-1\%$ mean), consistent with its steady-state share of only 3% (Section 4.3). The joint removal effect ($-15\%$) exceeds the sum of the individual effects ($-7\%$), suggesting that some of thresh-prox's benefit depends on the presence of a complementary supra-threshold calibrator. The primary novel predictor of value is thresh-prox; cong-mom's contribution is largely subsumed by it.
 
 ### 5.3 Homogeneous vs. Heterogeneous Population
 
@@ -214,10 +221,12 @@ The novel predictors improve mean payoff by approximately 15% on average. Since 
 | Heterogeneous | 55.9 | 30.2 | 48.0% |
 | Homogeneous | 50.6 | **40.1** | 48.5% |
 
-The mean congestion rates are comparable (both approximately 48%), but the attendance standard deviation is 33% larger for the homogeneous population. **Figure 7** illustrates the mechanism: the homogeneous population alternates between near-complete attendance (all agents share the same forecast, all drive, $A \approx 101$) and near-empty roads (all use transit, $A \approx 5$, driven by exploration alone), while the heterogeneous population produces moderate, self-correcting fluctuations around $T$. The homogeneous outcome is not simply worse on average but represents a qualitatively different, more volatile regime characterised by recurring aggregate overcorrections.
+The mean congestion rates are comparable (both approximately 48%), but the attendance standard deviation is 33% larger for the homogeneous population. **Figure 7** illustrates the mechanism: the homogeneous population alternates between near-complete attendance (all agents share the same forecast, all drive, $A \approx 101$) and near-empty roads (all use transit, $A \approx 5$, driven by exploration alone), while the heterogeneous population produces moderate fluctuations around $T$. The homogeneous outcome is not simply worse on average but represents a qualitatively different, more volatile regime characterised by recurring aggregate overcorrections, structurally similar to the oscillatory best-reply result of Section 4.1.
+
+Note that the homogeneous result depends on which six predictors are randomly drawn as the shared pool (seed 123 in this experiment). Running multiple draws would quantify the variance across shared predictor sets; the reported std=40.1 is for one specific draw.
 
 ![Figure 7](figure7_homo_hetero.png)
-*Figure 7: Homogeneous population (bottom) exhibits extreme swings; heterogeneous population (top) converges to stable near-threshold fluctuations.*
+*Figure 7: Homogeneous population (bottom) exhibits extreme swings; heterogeneous population (top) converges to moderate near-threshold fluctuations.*
 
 ---
 
@@ -225,25 +234,25 @@ The mean congestion rates are comparable (both approximately 48%), but the atten
 
 ### 6.1 Endogenous Coordination Without Communication
 
-The inductive model demonstrates that individual commuters, each independently applying a personal decision model, can collectively produce near-threshold attendance without any explicit communication or central authority. The mechanism is the **composition of active predictors**: predictors forecasting below $T$ attract more drivers, increasing congestion and reducing those predictors' scores, which in turn elevates the scores of predictors forecasting above $T$ and reduces driving the following round. This is a self-correcting feedback cycle operating through distributed score updates. The result is the foundational argument of Arthur (1994): bounded-rational induction can produce coordination outcomes without the common-knowledge assumptions required by equilibrium reasoning.
+The inductive model shows that individual commuters, each independently applying a personal decision model, can produce near-threshold attendance without explicit communication or central authority. The mechanism is the **composition of active predictors**: predictors forecasting below $T$ attract more drivers, increasing attendance toward congestion and thereby penalising those predictors; predictors forecasting above $T$ then gain score, reducing driving the following round. This feedback cycle operates entirely through distributed score updates. The result is the core finding of Arthur (1994): bounded-rational induction can produce coordination outcomes without the common-knowledge assumptions required by equilibrium reasoning.
 
 ### 6.2 Implications for Navigation Systems and Congestion Policy
 
-The homogeneous simulation represents a scenario in which all commuters receive recommendations from the same navigation algorithm: their predictor pools become effectively identical. The result (Figure 7, lower panel) is synchronised oscillation rather than near-threshold coordination. This pattern has been observed qualitatively in urban networks where dominant navigation applications simultaneously reroute large volumes of traffic onto previously uncongested roads. The minority game provides the formal mechanism: a single shared predictor destroys the distributional diversity that produces aggregate stability.
+The homogeneous simulation represents a scenario in which all commuters receive recommendations from the same navigation algorithm: their predictor pools become effectively identical. The result (Figure 7, lower panel) is synchronised oscillation. This pattern has been observed qualitatively in urban networks where dominant navigation applications simultaneously reroute large volumes of traffic onto previously uncongested roads. The minority game provides the formal mechanism: a single shared predictor removes the distributional diversity that produces aggregate stability.
 
-The welfare analysis (Section 2.3) provides quantitative grounding for policy: a coordination mechanism that reliably routes exactly $T=60$ drivers each morning achieves per-agent welfare $0.709$ versus the mixed-NE baseline of $0.300$, representing a potential near-doubling of commuter welfare and a quantifiable justification for road pricing or permit-based rationing.
+The welfare analysis (Section 2.3) quantifies the policy case: a mechanism directing exactly $T=60$ drivers each morning achieves per-agent welfare $0.716$ versus the mixed NE baseline of $0.300$, approximately doubling per-agent welfare and providing a quantifiable motivation for road pricing or permit-based rationing schemes.
 
 ### 6.3 Predictor Richness and Model Limitations
 
-The novel predictors, representing psychologically motivated decision rules (loss-aversion after congestion, mean-reversion toward capacity), contribute approximately 15% payoff improvement rather than a transformative gain. This is consistent with Arthur's finding that no predictor is universally superior: the value of any predictor depends on what others in the population are using. A thresh-prox predictor that performs well when rare becomes counterproductive when widely adopted, since coordinated mean-reversion would reproduce exactly the oscillation it was designed to avoid.
+The novel predictors contribute approximately 6--15% payoff improvement (mainly through thresh-prox), consistent with Arthur's observation that no predictor is universally superior: the value of any predictor depends on what others are using. A thresh-prox predictor that performs well when rare becomes counterproductive if adopted universally, since coordinated mean-reversion would reproduce oscillation of its own.
 
-**Relaxing model assumptions:** Heterogeneous travel costs would differentiate driver payoffs by introducing agent-specific indifference thresholds, shifting $p^*$ and the composition of stable predictor portfolios. Departure-time flexibility would expand the strategy space from binary to continuous, transforming the game into a scheduling problem. Information asymmetry -- where some drivers have real-time traffic data and others do not -- would produce a stratified active predictor landscape, with informed agents systematically outperforming uninformed ones. These extensions remain directions for future work.
+**Relaxing model assumptions.** Heterogeneous travel costs would introduce agent-specific indifference thresholds, shifting the effective $p^*$ and altering which predictors dominate in the stable predictor distribution. Departure-time flexibility would expand the strategy space from binary to continuous, transforming the problem into a scheduling game. Information asymmetry (some drivers with real-time feeds, others without) would produce a stratified predictor landscape, with informed agents systematically outperforming uninformed ones. These extensions remain directions for future work.
 
 ---
 
 ## Conclusion
 
-The minority game crystallises the tension between individual rationality and collective efficiency in urban commuting. The unique symmetric mixed NE ($p^* \approx 0.62$) produces congestion 65% of the time and achieves per-agent welfare of $0.30$, identical to universal transit use and 2.4 times below the social optimum. Myopic best-reply dynamics produce an oscillatory anti-coordination regime yielding the worst achievable payoff. Inductive agents following Arthur (1994), with heterogeneous predictor pools, converge near $T=60$ within 30 rounds, reduce congestion to approximately 46%, and earn mean payoff approximately $0.306$, marginally above the theoretical mixed NE benchmark. Ablation and sensitivity experiments quantify the contributions of novel predictors ($+15\%$ payoff) and stochastic exploration ($+15\%$ payoff). The homogeneous population experiment demonstrates that predictor diversity is structurally necessary rather than merely beneficial. The central implication for commuting infrastructure and recommendation system design is that diversity of strategies, rather than sophistication of individual strategies, produces collective near-optimality.
+The minority game demonstrates the tension between individual rationality and collective efficiency in urban commuting. The unique symmetric mixed NE ($p^* \approx 0.62$) produces congestion 65% of the time and achieves per-agent welfare of $0.30$, identical to universal transit use and 2.4 times below the social optimum. Stage-game best-reply dynamics produce an oscillatory anti-coordination regime yielding the worst achievable payoff and confirm that the mixed NE is not a dynamical attractor. Inductive agents following Arthur (1994), with heterogeneous predictor pools, stabilise near $T=60$ within 30 rounds, reduce congestion to approximately 46%, and achieve mean payoff $\approx 0.306$ on average across seeds -- marginally above the mixed NE benchmark with one seed falling below it. Ablation experiments show that thresh-prox accounts for most of the novel predictors' contribution (approximately 6--16% payoff improvement) while cong-mom's marginal effect is small; exploration contributes an average 15% payoff gain over pure exploitation. The homogeneous population experiment confirms that predictor diversity is structurally necessary. The central finding for commuting infrastructure and recommendation system design is that diversity of strategies among users, rather than sophistication of any individual strategy, produces collective near-optimality.
 
 ---
 

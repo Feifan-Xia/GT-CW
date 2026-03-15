@@ -286,16 +286,30 @@ def plot_predictor_composition(active_preds):
         print(f"  {name:14s}: {last50[i]:.3f}")
 
 
-def plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star):
-    """Figure 6: cumulative average payoff across the three dynamics."""
+def plot_cumulative_payoff(att_br, att_rnd, att_ind_list, p_star):
+    """
+    Figure 6: cumulative average payoff across the three dynamics.
+
+    att_ind_list : list of (M,) int arrays, one per seed.
+                   The mean across seeds is plotted as the solid inductive
+                   line; the +/-1 sigma band shows cross-seed variability.
+    """
     def cum_avg(att):
         return np.cumsum(population_payoff(att)) / (np.arange(M) + 1)
 
+    ind_curves = np.array([cum_avg(att) for att in att_ind_list])
+    ind_mean   = ind_curves.mean(axis=0)
+    ind_std    = ind_curves.std(axis=0)
+    rounds     = np.arange(M)
+
     fig, ax = plt.subplots(figsize=(10, 4.2))
-    ax.plot(cum_avg(att_br),  color=COL_BR,  lw=2, label='Myopic best-reply')
+    ax.plot(cum_avg(att_br),  color=COL_BR,  lw=2, label='Stage-game best-reply')
     ax.plot(cum_avg(att_rnd), color=COL_RND, lw=2,
-            label=f'Random $p^*={p_star:.3f}$ (mixed NE benchmark)')
-    ax.plot(cum_avg(att_ind), color=COL_IND, lw=2, label='Inductive')
+            label=f'Random $p^*={p_star:.3f}$ (mixed NE)')
+    ax.plot(rounds, ind_mean, color=COL_IND, lw=2,
+            label=f'Inductive (mean, {len(att_ind_list)} seeds)')
+    ax.fill_between(rounds, ind_mean - ind_std, ind_mean + ind_std,
+                    color=COL_IND, alpha=0.2, label='$\\pm 1\\sigma$ across seeds')
     ax.axhline(R_STAY, color='gray', ls=':', lw=1.2,
                label=f'$r_{{\\mathrm{{transit}}}}={R_STAY}$')
     ax.set_xlabel('Round $t$', fontsize=11)

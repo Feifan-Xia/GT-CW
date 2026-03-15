@@ -44,7 +44,7 @@ def main():
     print(f"[Static]  Congestion fraction at p*: {cf:.2%}")
 
     # ------------------------------------------------------------------
-    # Module 3: myopic best-reply (Figure 3)
+    # Module 3: stage-game best-reply (Figure 3)
     # ------------------------------------------------------------------
     att_br = run_best_reply()
     plot_best_reply(att_br, p_star)
@@ -55,30 +55,51 @@ def main():
 
     # ------------------------------------------------------------------
     # Module 4: inductive agents (Figures 4, 5, 6)
+    # Run all three seeds once; seed-42 results drive Figures 4 and 5.
     # ------------------------------------------------------------------
-    rng4 = np.random.default_rng(SEEDS[0])
-    att_ind, active_preds, dec_log = run_inductive(rng4)
-    plot_inductive_attendance(att_ind, p_star)
-    plot_predictor_composition(active_preds)
+    att_ind_list  = []
+    ap_list       = []
+    dl_list       = []
 
-    rng_rnd = np.random.default_rng(SEEDS[0] + 99)
-    att_rnd = run_random_baseline(p_star, rng_rnd)
-    plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star)
-
-    ind_pay = compute_individual_payoffs(att_ind, dec_log)
-    print(f"[Inductive] Individual payoffs -- "
-          f"mean={ind_pay.mean():.3f}, std={ind_pay.std():.3f}, "
-          f"min={ind_pay.min():.3f}, max={ind_pay.max():.3f}")
-
-    # -- Robustness across seeds --
     print("\n[Robustness] Inductive agents across seeds:")
     for s in SEEDS:
         rng_s = np.random.default_rng(s)
-        att_s, _, _ = run_inductive(rng_s)
+        att_s, ap_s, dl_s = run_inductive(rng_s)
+        att_ind_list.append(att_s)
+        ap_list.append(ap_s)
+        dl_list.append(dl_s)
         print(f"  seed={s}: mean={np.mean(att_s):.2f}, "
               f"std={np.std(att_s):.2f}, "
               f"congested={np.mean(att_s > T):.1%}, "
               f"mean payoff={np.mean(population_payoff(att_s)):.3f}")
+
+    # Seed-42 (index 0) used for Figures 4 and 5
+    att_ind      = att_ind_list[0]
+    active_preds = ap_list[0]
+    dec_log      = dl_list[0]
+
+    plot_inductive_attendance(att_ind, p_star)
+    plot_predictor_composition(active_preds)
+
+    # Figure 6: 3-seed mean +/- 1sigma
+    rng_rnd = np.random.default_rng(SEEDS[0] + 99)
+    att_rnd = run_random_baseline(p_star, rng_rnd)
+    plot_cumulative_payoff(att_br, att_rnd, att_ind_list, p_star)
+
+    # Individual payoff heterogeneity (seed 42)
+    ind_pay = compute_individual_payoffs(att_ind, dec_log)
+    print(f"\n[Inductive] Individual payoffs (seed {SEEDS[0]}) -- "
+          f"mean={ind_pay.mean():.3f}, std={ind_pay.std():.3f}, "
+          f"min={ind_pay.min():.3f}, max={ind_pay.max():.3f}")
+
+    # Fraction of agents whose active predictor directed to drive (forecast <= T)
+    # in each round.  This tests the claimed ~T/N drive fraction.
+    from config import PREDICTOR_NAMES
+    pool = __import__('inductive').build_predictor_pool()
+    # We use the decisions_log directly as a proxy: drive fraction per round
+    drive_fracs = dec_log.mean(axis=1)
+    print(f"[Inductive] Mean drive fraction (seed 42): {drive_fracs.mean():.3f}  "
+          f"(T/N={T/N:.3f})")
 
     # ------------------------------------------------------------------
     # Module 5: homogeneous vs. heterogeneous (Figure 7)
@@ -105,13 +126,28 @@ def main():
               f"cong={np.mean(att_e0 > T):.1%}, "
               f"mean payoff={np.mean(population_payoff(att_e0)):.3f}")
 
-    # -- Ablation: remove novel predictors --
-    print("\n[Ablation] Without novel predictors (cong_mom, thresh_prox):")
+    # -- Ablation: individual predictors and joint removal --
+    print("\n[Ablation] thresh_prox only removed (index 7):")
+    for s in SEEDS:
+        rng_a = np.random.default_rng(s)
+        att_a, _, _ = run_inductive(rng_a, excluded_pred=[7])
+        print(f"  seed={s}: mean={np.mean(att_a):.2f}, "
+              f"cong={np.mean(att_a > T):.1%}, "
+              f"mean payoff={np.mean(population_payoff(att_a)):.3f}")
+
+    print("\n[Ablation] cong_mom only removed (index 6):")
+    for s in SEEDS:
+        rng_a = np.random.default_rng(s)
+        att_a, _, _ = run_inductive(rng_a, excluded_pred=[6])
+        print(f"  seed={s}: mean={np.mean(att_a):.2f}, "
+              f"cong={np.mean(att_a > T):.1%}, "
+              f"mean payoff={np.mean(population_payoff(att_a)):.3f}")
+
+    print("\n[Ablation] Both novel predictors removed:")
     for s in SEEDS:
         rng_a = np.random.default_rng(s)
         att_ab, _, _ = run_inductive(rng_a, excluded_pred=NOVEL_IDX)
         print(f"  seed={s}: mean={np.mean(att_ab):.2f}, "
-              f"std={np.std(att_ab):.2f}, "
               f"cong={np.mean(att_ab > T):.1%}, "
               f"mean payoff={np.mean(population_payoff(att_ab)):.3f}")
 
