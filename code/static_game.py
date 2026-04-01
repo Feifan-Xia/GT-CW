@@ -65,7 +65,7 @@ def simulate_static(p_star, rng, n_trials=1000):
     _plot_static_sweep(p_values, mean_r_go, mean_attend, p_star)
 
     # -- Figure 2 data --
-    n_runs = 500
+    n_runs = 1000
     att_pstar = np.array([run_static_game(p_star, rng)[0] for _ in range(n_runs)])
     congested_frac  = np.mean(att_pstar > T)
     empirical_mean  = np.mean(att_pstar)

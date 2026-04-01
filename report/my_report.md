@@ -110,16 +110,12 @@ Running 1,000 independent single-shot games for each $p \in \{0.10, 0.15, \ldots
 
 【把500run 向之前对齐到1000】
 
-**Figure 2** shows 500 independent single-shot outcomes at $p = p^*$. The empirical mean is $62.55 \approx Np^* = 62.64$, empirical standard deviation $\sigma = 4.93$, and theoretical binomial standard deviation $\sqrt{Np^*(1-p^*)} = 4.88$, a near-perfect agreement validating simulation fidelity. Congestion ($A > T = 60$) occurs in **65.4%** of rounds.
+**Figure 2** shows 1000 independent single-shot outcomes at $p = p^*$. The empirical mean is $62.55 \approx Np^* = 62.64$, empirical standard deviation $\sigma = 4.93$, and theoretical binomial standard deviation $\sqrt{Np^*(1-p^*)} = 4.88$, a near-perfect agreement validating simulation fidelity. Congestion ($A > T = 60$) occurs in **65.4%** of rounds.
 
 ![Figure 2](figure2_histogram_pstar.png)
-*Figure 2: Attendance histogram at $p^*$ (500 runs). Congestion in 65.4% of rounds, despite every player playing the mixed NE.*
+*Figure 2: Attendance histogram at $p^*$ (1000 runs). Congestion in 65.4% of rounds, despite every player playing the mixed NE.*
 
 Even if every commuter knew $p^*$ and played it, congestion would occur on two out of every three mornings due to binomial variance. This motivates the repeated game: is there an adaptive strategy that exploits memory to reduce the 65% congestion rate?
-
-【算一个average. 看是不是和之前曲线consistent. 】
-
-【这里加一个总结 即使按照p=p* 效果如何】
 
 ---
 
@@ -138,11 +134,11 @@ Note that this constitutes a best response to the *previous* period's outcome, n
 ![Figure 3](figure3_best_response.png)
 *Figure 3: Stage-game best-reply -- permanent 0--101 oscillation. Mean payoff $= (0.3 + 0)/2 = 0.15$, below the transit-only payoff.*
 
-This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of what any fixed strategy achieves【写的更explicit, quote 之前算出来的0.3】. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
+This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of the payoff $0.30$ achieved by any fixed strategy such as always driving, always using transit, or randomising at $p^*$. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
 
 For commuting applications: a navigation system that broadcasts a single uniform recommendation to all users would replicate this failure. Universal adoption of a single reactive rule on a heavily used road creates the oscillatory pattern qualitatively consistent with periodic flow waves observed on instrumented ring roads.
 
-【这里加一个过渡 引出Inductive Strategies】
+This motivates the inductive approach, where agents use heterogeneous predictors to achieve coordination near the threshold without requiring common knowledge or communication.
 
 ### 4.2 Inductive Strategies
 
@@ -190,9 +186,7 @@ Convergence is not the result of agents computing $p^*$. Rather, the **compositi
 **Predictor composition (Figure 5).** The active predictor distribution shifts over time: avg-7 and thresh-prox dominate in the converged steady state (each approximately 23% share), with cycle-2 at 13%, reflecting the residual short-period oscillations visible in Figure 4. The trend predictor is eliminated (0% share) as it systematically overestimates momentum and is outcompeted across all history conditions. The novel thresh-prox achieves 23% steady-state share, confirming its relevance in the commuting setting; cong-mom reaches only 3%, consistent with its narrower calibration advantage (Section 4.2).
 
 ![Figure 5](figure5_predictor_ecology.png)
-
-【配色改的更好看 和fig6的color scheme 对齐. 并且能看出来相似的predictor group用的是不用透明度】
-*Figure 5: Active predictor composition -- trend predictor eliminated; thresh-prox and avg-7 dominate at convergence.*
+*Figure 5: Active predictor composition -- trend predictor eliminated; thresh-prox and avg-7 dominate at convergence. Predictors grouped by color (basic: blue, averaging: purple, opposite: orange, momentum: red, novel: green, cyclic: green shades) with varying transparency for intra-group distinction.*
 
 **Payoff comparison (Figure 6).** **Figure 6** plots cumulative average payoff for the three populations, with the inductive line showing the mean across three seeds (shaded band: $\pm 1\sigma$). In steady state:
 
@@ -209,7 +203,7 @@ Individual seed payoffs are [0.294, 0.300, 0.323], with seed 42 being the only s
 
 ---
 
-## 5. Robustness and Sensitivity Analysis 【low优先级 是否要改成ablation or ..ablation.. 】
+## 5. Ablation and Sensitivity Analysis
 
 ### 5.1 Exploration vs. Exploitation
 

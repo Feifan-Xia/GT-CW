@@ -151,6 +151,17 @@ def main():
               f"cong={np.mean(att_ab > T):.1%}, "
               f"mean payoff={np.mean(population_payoff(att_ab)):.3f}")
 
+    # -- Ablation: predictor count per agent --
+    print("\n[Ablation] Predictor count per agent (K):")
+    for k in [3, 6, 9]:
+        print(f"  K={k}:")
+        for s in SEEDS:
+            rng_k = np.random.default_rng(s)
+            att_k, _, _ = run_inductive(rng_k, k=k)
+            print(f"    seed={s}: mean={np.mean(att_k):.2f}, "
+                  f"cong={np.mean(att_k > T):.1%}, "
+                  f"mean payoff={np.mean(population_payoff(att_k)):.3f}")
+
     print("\n" + "=" * 65)
     print(f"p* = {p_star:.4f}  |  Np* = {N * p_star:.2f}  |  T = {T}")
     print("All 7 figures saved to the report directory.")

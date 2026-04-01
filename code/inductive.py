@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 from config import (
     N, T, R_STAY, M, EPSILON, GAMMA, DELTA, K, WARMUP,
-    COL_IND, COL_BR, COL_RND, COL_T, COL_NP,
+    COL_IND, COL_BR, COL_RND, COL_T, COL_NP, COL_HET,
     PREDICTOR_NAMES, N_PREDICTORS, NOVEL_IDX,
     OUT_DIR,
 )
@@ -102,9 +102,9 @@ class InductiveAgent:
 
     def __init__(self, pred_indices: list, rng, epsilon: float = EPSILON):
         self.pred_idx  = list(pred_indices)
-        self.scores    = np.ones(K, dtype=float)
+        self.scores    = np.ones(len(pred_indices), dtype=float)
         self.T_hat     = float(T)
-        self._last_fc  = np.full(K, float(T))
+        self._last_fc  = np.full(len(pred_indices), float(T))
         self._rng      = rng
         self._epsilon  = epsilon
 
@@ -138,6 +138,7 @@ def run_inductive(
     homogeneous: bool = False,
     epsilon: float = EPSILON,
     excluded_pred=None,
+    k: int = K,
 ):
     """
     Run M rounds of the inductive minority game.
@@ -148,6 +149,7 @@ def run_inductive(
     epsilon       : exploration probability (0 = pure exploitation)
     excluded_pred : list of global predictor indices excluded from draw
                     (used for ablation experiments)
+    k             : number of predictors per agent (default K=6)
 
     Returns
     -------
@@ -160,7 +162,7 @@ def run_inductive(
         i for i in range(N_PREDICTORS)
         if excluded_pred is None or i not in excluded_pred
     ]
-    k_draw = min(K, len(available))
+    k_draw = min(k, len(available))
 
     if homogeneous:
         shared = rng.choice(available, k_draw, replace=False).tolist()
@@ -256,13 +258,39 @@ def plot_predictor_composition(active_preds):
     cmap   = plt.colormaps.get_cmap('tab20')
     colors = [cmap(i / N_PREDICTORS) for i in range(N_PREDICTORS)]
 
+    # Group predictors for better visualization
+    groups = {
+        'basic': ['last'],
+        'averaging': ['avg3', 'avg5', 'avg7'],
+        'opposite': ['contrarian'],
+        'momentum': ['trend'],
+        'novel': ['cong_mom', 'thresh_prox'],
+        'cyclic': ['cycle2', 'cycle3', 'cycle5']
+    }
+    
+    # Assign colors per group, with varying alpha for intra-group distinction
+    group_colors = {
+        'basic': COL_BR,      # blue
+        'averaging': COL_IND, # purple
+        'opposite': COL_RND,  # orange
+        'momentum': COL_T,    # red
+        'novel': COL_NP,      # green
+        'cyclic': COL_HET     # green (different shade)
+    }
+    
+    alphas = [0.9, 0.7, 0.5]  # for multiple in same group
+
     fig, ax = plt.subplots(figsize=(11, 4.5))
     bottoms = np.zeros(M)
-    for pidx in range(N_PREDICTORS):
-        ax.fill_between(range(M), bottoms, bottoms + fracs_s[:, pidx],
-                        color=colors[pidx], alpha=0.85,
-                        label=PREDICTOR_NAMES[pidx])
-        bottoms += fracs_s[:, pidx]
+    for group_name, pred_names in groups.items():
+        base_color = group_colors[group_name]
+        for i, pred_name in enumerate(pred_names):
+            pidx = PREDICTOR_NAMES.index(pred_name)
+            alpha = alphas[min(i, len(alphas)-1)]
+            ax.fill_between(range(M), bottoms, bottoms + fracs_s[:, pidx],
+                            color=base_color, alpha=alpha,
+                            label=pred_name)
+            bottoms += fracs_s[:, pidx]
 
     ax.set_xlabel('Round $t$', fontsize=11)
     ax.set_ylabel('Fraction of agents', fontsize=11)
