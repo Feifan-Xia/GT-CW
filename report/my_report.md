@@ -24,7 +24,9 @@ The stage game is defined by three components:
 
 **Payoff** (consistent with project spec: "more than $T$ drivers $\Rightarrow$ unhappy"):
 
-$$r_i(s_i, \mathbf{s}_{-i}) = \begin{cases} 1 & \text{if } s_i = \textit{drive} \text{ and } A \leq T \\ 0 & \text{if } s_i = \textit{drive} \text{ and } A > T \\ r_{\text{transit}} = 0.3 & \text{if } s_i = \textit{transit} \end{cases}$$
+$$
+r_i(s_i, \mathbf{s}_{-i}) = \begin{cases} 1 & \text{if } s_i = \textit{drive} \text{ and } A \leq T \\ 0 & \text{if } s_i = \textit{drive} \text{ and } A > T \\ r_{\text{transit}} = 0.3 & \text{if } s_i = \textit{transit} \end{cases}
+$$
 
 The payoff $r_{\text{transit}} = 0.3$ reflects the reliable but modest utility of public transport. Driving strictly dominates transit *if and only if* the road is uncongested, creating the minority-game tension.
 
@@ -62,11 +64,15 @@ There are $\binom{101}{60}$ such equilibria, an astronomically large uncoordinat
 
 Each player independently drives with probability $p$. Indifference requires $\mathbb{E}[r \mid \textit{drive}] = r_{\text{transit}} = 0.3$:
 
-$$P\!\left(\text{Bin}(100,\,p) \leq T{-}1\right) = P\!\left(A_{-i} + 1 \leq T\right) = 0.3$$
+$$
+P\!\left(\text{Bin}(100,\,p) \leq T{-}1\right) = P\!\left(A_{-i} + 1 \leq T\right) = 0.3
+$$
 
 Since $P(\text{Bin}(100, p) \leq 59)$ is **strictly decreasing** in $p$, the equation has a **unique solution**:
 
-$$p^* \approx 0.6202, \qquad Np^* \approx 62.6 > T = 60$$
+$$
+p^* \approx 0.6202, \qquad Np^* \approx 62.6 > T = 60
+$$
 
 At $p^*$, expected attendance exceeds the threshold. This is not paradoxical: indifference is achieved when a marginal driver faces exactly a 30% chance of an uncongested road -- consistent with mean attendance slightly above capacity, because the binomial variance ($\sigma = \sqrt{Np^*(1-p^*)} \approx 4.9$) keeps the probability of $A \leq 60$ at 35% even when $\mathbb{E}[A] = 62.6$. The congestion rate is $P(A > 60) \approx 65\%$, confirmed empirically at 65.4%.
 
@@ -74,12 +80,12 @@ At $p^*$, expected attendance exceeds the threshold. This is not paradoxical: in
 
 The mixed NE is Pareto-inefficient. At the indifference condition, every player earns exactly $r_{\text{transit}} = 0.3$, the same as choosing transit at every round.
 
-| Outcome | Mean attendance | Per-agent payoff | Total welfare |
-|---------|----------------|-----------------|---------------|
-| All transit | 0 | 0.300 | 30.3 |
-| Mixed NE ($p^* = 0.62$) | 62.6 | **0.300** | **30.3** |
-| Inductive agents (simulated) | ~56 | ~0.306 | ~30.9 |
-| Social optimum = Asymm. NE ($A=60$) | 60 | **0.716** | **72.3** |
+| Outcome                               | Mean attendance | Per-agent payoff | Total welfare  |
+| ------------------------------------- | --------------- | ---------------- | -------------- |
+| All transit                           | 0               | 0.300            | 30.3           |
+| Mixed NE ($p^* = 0.62$)             | 62.6            | **0.300**  | **30.3** |
+| Inductive agents (simulated)          | ~56             | ~0.306           | ~30.9          |
+| Social optimum = Asymm. NE ($A=60$) | 60              | **0.716**  | **72.3** |
 
 The social optimum coincides with any asymmetric pure NE with exactly $T=60$ drivers: total welfare $= 60 \times 1 + 41 \times 0.3 = 72.3$, or $0.716$ per agent, **2.4 times the mixed NE welfare**. The mixed NE represents a coordination failure: each commuter rationally accounts for others' independence, and the collective result is that the road is congested nearly two-thirds of the time despite all players earning only $0.3$.
 
@@ -98,7 +104,11 @@ Running 1,000 independent single-shot games for each $p \in \{0.10, 0.15, \ldots
 ![Figure 1](figure1_static_sweep.png)
 *Figure 1: (a) Indifference condition -- $\mathbb{E}[r \mid drive]$ crosses $r_\text{transit}=0.3$ at $p^*\approx 0.62$. (b) Mean attendance $\mathbb{E}[A]$ vs $p$ across the full sweep, with $T$ and $Np^*$ marked.*
 
+// ab 图交换位置
+
 ### 3.2 Attendance Distribution at $p^*$
+
+【把500run 向之前对齐到1000】
 
 **Figure 2** shows 500 independent single-shot outcomes at $p = p^*$. The empirical mean is $62.55 \approx Np^* = 62.64$, empirical standard deviation $\sigma = 4.93$, and theoretical binomial standard deviation $\sqrt{Np^*(1-p^*)} = 4.88$, a near-perfect agreement validating simulation fidelity. Congestion ($A > T = 60$) occurs in **65.4%** of rounds.
 
@@ -106,6 +116,10 @@ Running 1,000 independent single-shot games for each $p \in \{0.10, 0.15, \ldots
 *Figure 2: Attendance histogram at $p^*$ (500 runs). Congestion in 65.4% of rounds, despite every player playing the mixed NE.*
 
 Even if every commuter knew $p^*$ and played it, congestion would occur on two out of every three mornings due to binomial variance. This motivates the repeated game: is there an adaptive strategy that exploits memory to reduce the 65% congestion rate?
+
+【算一个average. 看是不是和之前曲线consistent. 】
+
+【这里加一个总结 即使按照p=p* 效果如何】
 
 ---
 
@@ -124,9 +138,11 @@ Note that this constitutes a best response to the *previous* period's outcome, n
 ![Figure 3](figure3_best_response.png)
 *Figure 3: Stage-game best-reply -- permanent 0--101 oscillation. Mean payoff $= (0.3 + 0)/2 = 0.15$, below the transit-only payoff.*
 
-This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of what any fixed strategy achieves. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
+This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of what any fixed strategy achieves【写的更explicit, quote 之前算出来的0.3】. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
 
 For commuting applications: a navigation system that broadcasts a single uniform recommendation to all users would replicate this failure. Universal adoption of a single reactive rule on a heavily used road creates the oscillatory pattern qualitatively consistent with periodic flow waves observed on instrumented ring roads.
+
+【这里加一个过渡 引出Inductive Strategies】
 
 ### 4.2 Inductive Strategies
 
@@ -136,15 +152,15 @@ Following Arthur (1994), agents replace reactive rules with **inductive predicto
 
 **Predictor pool:**
 
-| Predictor | Forecast $\hat{A}_t$ | Motivation |
-|-----------|---------------------|------------|
-| last | $A_{t-1}$ | Yesterday repeats |
-| avg-$n$ ($n \in \{3,5,7\}$) | $\bar{A}_{t-n:t}$ | Inertia of recent flow |
-| contrarian | $2T - A_{t-1}$ | Oscillation half-period |
-| trend | $A_{t-1} + \Delta A_{t-1}$, clipped to $[0,N]$ | Momentum extrapolation |
-| **cong-mom** *(novel)* | $A_{t-1} + 0.5(T{-}A_{t-1})$ if $A_{t-1}{>}T$, else $A_{t-1}$ | Partial recovery after congestion |
-| **thresh-prox** *(novel)* | $T + 0.5(A_{t-1}{-}T)$ | Mean-reversion toward capacity |
-| cycle-$k$ ($k \in \{2,3,5\}$) | $A_{t-k}$ | Periodic pattern detection |
+| Predictor                         | Forecast$\hat{A}_t$                                               | Motivation                        |
+| --------------------------------- | ------------------------------------------------------------------- | --------------------------------- |
+| last                              | $A_{t-1}$                                                         | Yesterday repeats                 |
+| avg-$n$ ($n \in \{3,5,7\}$)   | $\bar{A}_{t-n:t}$                                                 | Inertia of recent flow            |
+| contrarian                        | $2T - A_{t-1}$                                                    | Oscillation half-period           |
+| trend                             | $A_{t-1} + \Delta A_{t-1}$, clipped to $[0,N]$                  | Momentum extrapolation            |
+| **cong-mom** *(novel)*    | $A_{t-1} + 0.5(T{-}A_{t-1})$ if $A_{t-1}{>}T$, else $A_{t-1}$ | Partial recovery after congestion |
+| **thresh-prox** *(novel)* | $T + 0.5(A_{t-1}{-}T)$                                            | Mean-reversion toward capacity    |
+| cycle-$k$ ($k \in \{2,3,5\}$) | $A_{t-k}$                                                         | Periodic pattern detection        |
 
 A key **coverage condition** (Arthur 1994): the pool must span both sides of $T$ so that each round some agents are directed to drive and others to transit. Contrarian, cycle-$k$, avg-$n$, and thresh-prox produce a distribution of forecasts on both sides of $T$ depending on history, preventing systematic bias.
 
@@ -152,11 +168,15 @@ A key **coverage condition** (Arthur 1994): the pool must span both sides of $T$
 
 **Score update:** Each predictor's accuracy is tracked via exponential smoothing:
 
-$$\text{score}_d(t) = \gamma \cdot \text{score}_d(t{-}1) + \mathbf{1}\!\left[|\hat{A}_{d,t} - A_t| < \delta\right], \quad \gamma = 0.9,\; \delta = 5$$
+$$
+\text{score}_d(t) = \gamma \cdot \text{score}_d(t{-}1) + \mathbf{1}\!\left[|\hat{A}_{d,t} - A_t| < \delta\right], \quad \gamma = 0.9,\; \delta = 5
+$$
 
 This update uses the forecasts from the most recent non-exploration round; during $\varepsilon$-exploration rounds the scores are updated but the active forecast is not refreshed. The agent follows the highest-scoring predictor, with exploration probability $\varepsilon = 0.05$. The decision threshold is $T$ (public knowledge -- road capacity is posted):
 
-$$s_i(t) = \begin{cases} \textit{drive} & \text{if } \hat{A}_t \leq T \\ \textit{transit} & \text{otherwise} \end{cases}$$
+$$
+s_i(t) = \begin{cases} \textit{drive} & \text{if } \hat{A}_t \leq T \\ \textit{transit} & \text{otherwise} \end{cases}
+$$
 
 ### 4.3 Simulation Results
 
@@ -170,6 +190,8 @@ Convergence is not the result of agents computing $p^*$. Rather, the **compositi
 **Predictor composition (Figure 5).** The active predictor distribution shifts over time: avg-7 and thresh-prox dominate in the converged steady state (each approximately 23% share), with cycle-2 at 13%, reflecting the residual short-period oscillations visible in Figure 4. The trend predictor is eliminated (0% share) as it systematically overestimates momentum and is outcompeted across all history conditions. The novel thresh-prox achieves 23% steady-state share, confirming its relevance in the commuting setting; cong-mom reaches only 3%, consistent with its narrower calibration advantage (Section 4.2).
 
 ![Figure 5](figure5_predictor_ecology.png)
+
+【配色改的更好看 和fig6的color scheme 对齐. 并且能看出来相似的predictor group用的是不用透明度】
 *Figure 5: Active predictor composition -- trend predictor eliminated; thresh-prox and avg-7 dominate at convergence.*
 
 **Payoff comparison (Figure 6).** **Figure 6** plots cumulative average payoff for the three populations, with the inductive line showing the mean across three seeds (shaded band: $\pm 1\sigma$). In steady state:
@@ -187,39 +209,41 @@ Individual seed payoffs are [0.294, 0.300, 0.323], with seed 42 being the only s
 
 ---
 
-## 5. Robustness and Sensitivity Analysis
+## 5. Robustness and Sensitivity Analysis 【low优先级 是否要改成ablation or ..ablation.. 】
 
 ### 5.1 Exploration vs. Exploitation
 
 Setting $\varepsilon = 0$ (pure exploitation, no stochastic exploration):
 
-| Seed | Mean payoff ($\varepsilon=0.05$) | Mean payoff ($\varepsilon=0$) | Change |
-|------|-------------------------------|------------------------------|--------|
-| 42 | 0.294 | 0.266 | $-9.5\%$ |
-| 123 | 0.300 | 0.259 | $-13.7\%$ |
-| 7 | 0.323 | 0.252 | $-22.0\%$ |
+| Seed | Mean payoff ($\varepsilon=0.05$) | Mean payoff ($\varepsilon=0$) | Change      |
+| ---- | ---------------------------------- | ------------------------------- | ----------- |
+| 42   | 0.294                              | 0.266                           | $-9.5\%$  |
+| 123  | 0.300                              | 0.259                           | $-13.7\%$ |
+| 7    | 0.323                              | 0.252                           | $-22.0\%$ |
 
 Without exploration, agents lock into their initial best predictor early and cannot adapt as the predictor landscape shifts around them. Payoff declines consistently across seeds (average $-15\%$). A small degree of stochastic deviation from the current best rule (5% random action rate) is necessary for sustained near-threshold coordination.
+
+【加一个H2级别的 predictor 数量的ablation】
 
 ### 5.2 Contribution of Novel Predictors (Ablation)
 
 The table below shows the effect of removing each novel predictor individually and jointly. To isolate contribution from reduction in pool size, we note that removing one predictor from 11 still leaves abundant combinatorial diversity ($\binom{10}{6} = 210$ vs $\binom{11}{6} = 462$ distinct agent subsets).
 
-| Condition | Seed 42 | Seed 123 | Seed 7 | Mean | $\Delta$ vs full |
-|-----------|---------|----------|--------|------|-----------------|
-| Full pool | 0.294 | 0.300 | 0.323 | 0.306 | -- |
-| Remove thresh-prox only | 0.293 | 0.300 | 0.271 | 0.288 | $-5.9\%$ |
-| Remove cong-mom only | 0.314 | 0.306 | 0.289 | 0.303 | $-1.0\%$ |
-| Remove both | 0.249 | 0.271 | 0.260 | 0.260 | $-15.0\%$ |
+| Condition               | Seed 42 | Seed 123 | Seed 7 | Mean  | $\Delta$ vs full |
+| ----------------------- | ------- | -------- | ------ | ----- | ------------------ |
+| Full pool               | 0.294   | 0.300    | 0.323  | 0.306 | --                 |
+| Remove thresh-prox only | 0.293   | 0.300    | 0.271  | 0.288 | $-5.9\%$         |
+| Remove cong-mom only    | 0.314   | 0.306    | 0.289  | 0.303 | $-1.0\%$         |
+| Remove both             | 0.249   | 0.271    | 0.260  | 0.260 | $-15.0\%$        |
 
 The results clarify the individual contributions: thresh-prox accounts for most of the ablation effect (predominantly at seed 7, $-16\%$), while cong-mom's marginal contribution is small ($-1\%$ mean), consistent with its steady-state share of only 3% (Section 4.3). The joint removal effect ($-15\%$) exceeds the sum of the individual effects ($-7\%$), suggesting that some of thresh-prox's benefit depends on the presence of a complementary supra-threshold calibrator. The primary novel predictor of value is thresh-prox; cong-mom's contribution is largely subsumed by it.
 
 ### 5.3 Homogeneous vs. Heterogeneous Population
 
-| Population | Mean ($A$) | Std ($A$) | Congestion rate |
-|------------|-----------|-----------|-----------------|
-| Heterogeneous | 55.9 | 30.2 | 48.0% |
-| Homogeneous | 50.6 | **40.1** | 48.5% |
+| Population    | Mean ($A$) | Std ($A$)    | Congestion rate |
+| ------------- | ------------ | -------------- | --------------- |
+| Heterogeneous | 55.9         | 30.2           | 48.0%           |
+| Homogeneous   | 50.6         | **40.1** | 48.5%           |
 
 The mean congestion rates are comparable (both approximately 48%), but the attendance standard deviation is 33% larger for the homogeneous population. **Figure 7** illustrates the mechanism: the homogeneous population alternates between near-complete attendance (all agents share the same forecast, all drive, $A \approx 101$) and near-empty roads (all use transit, $A \approx 5$, driven by exploration alone), while the heterogeneous population produces moderate fluctuations around $T$. The homogeneous outcome is not simply worse on average but represents a qualitatively different, more volatile regime characterised by recurring aggregate overcorrections, structurally similar to the oscillatory best-reply result of Section 4.1.
 
@@ -264,8 +288,8 @@ Arthur, W. B. (1994). Inductive reasoning and bounded rationality. *American Eco
 
 ## Appendix: GenAI Declaration
 
-| Category | Use |
-|----------|-----|
-| **Ideation** | Claude Code (claude-sonnet-4-6) used to help structure report sections and identify key simulation insights. All theoretical arguments verified independently against the game-theoretic definitions covered in module lectures. |
-| **Coding** | Claude Code (claude-sonnet-4-6) used to draft and debug Python simulation. All predictor designs, parameter choices, and experimental designs (sensitivity, ablation) specified by the student and verified against expected results. |
-| **Report writing** | Claude Code (claude-sonnet-4-6) used to draft initial text. All claims cross-checked against simulation output. All equations derived independently. Final editing by the student. |
+| Category                 | Use                                                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ideation**       | Claude Code (claude-sonnet-4-6) used to help structure report sections and identify key simulation insights. All theoretical arguments verified independently against the game-theoretic definitions covered in module lectures.      |
+| **Coding**         | Claude Code (claude-sonnet-4-6) used to draft and debug Python simulation. All predictor designs, parameter choices, and experimental designs (sensitivity, ablation) specified by the student and verified against expected results. |
+| **Report writing** | Claude Code (claude-sonnet-4-6) used to draft initial text. All claims cross-checked against simulation output. All equations derived independently. Final editing by the student.                                                    |
