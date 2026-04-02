@@ -215,9 +215,20 @@ Setting $\varepsilon = 0$ (pure exploitation, no stochastic exploration):
 
 Without exploration, agents lock into their initial best predictor early and cannot adapt as the predictor landscape shifts around them. Payoff declines consistently across seeds (average $-15\%$). A small degree of stochastic deviation from the current best rule (5% random action rate) is necessary for sustained near-threshold coordination.
 
-【加一个H2级别的 predictor 数量的ablation】
+### 5.2 Predictor Count per Agent (K)
 
-### 5.2 Contribution of Novel Predictors (Ablation)
+Varying the number of predictors $K$ assigned to each agent controls the degree of subset overlap among the population.
+
+| Seed           | Mean payoff ($K=3$) | Mean payoff ($K=6$) | Mean payoff ($K=9$) |
+| -------------- | --------------------- | --------------------- | --------------------- |
+| 42             | 0.337                 | 0.294                 | 0.230                 |
+| 123            | 0.302                 | 0.300                 | 0.242                 |
+| 7              | 0.344                 | 0.323                 | 0.244                 |
+| **Mean** | **0.328**       | **0.306**       | **0.239**       |
+
+Agents with fewer predictors ($K=3$) achieve a higher stable payoff on average ($0.328$). As $K$ increases toward $11$, the probability of agents sharing the exact same highest-scoring predictor rises. This structural overlap leads to synchronised behavior (herd dynamics), causing drastic aggregate overcorrections. Consequently, the congestion rate limits efficiency, and mean payoff collapses to $0.239$ for $K=9$.
+
+### 5.3 Contribution of Novel Predictors (Ablation)
 
 The table below shows the effect of removing each novel predictor individually and jointly. To isolate contribution from reduction in pool size, we note that removing one predictor from 11 still leaves abundant combinatorial diversity ($\binom{10}{6} = 210$ vs $\binom{11}{6} = 462$ distinct agent subsets).
 
@@ -230,7 +241,7 @@ The table below shows the effect of removing each novel predictor individually a
 
 The results clarify the individual contributions: thresh-prox accounts for most of the ablation effect (predominantly at seed 7, $-16\%$), while cong-mom's marginal contribution is small ($-1\%$ mean), consistent with its steady-state share of only 3% (Section 4.3). The joint removal effect ($-15\%$) exceeds the sum of the individual effects ($-7\%$), suggesting that some of thresh-prox's benefit depends on the presence of a complementary supra-threshold calibrator. The primary novel predictor of value is thresh-prox; cong-mom's contribution is largely subsumed by it.
 
-### 5.3 Homogeneous vs. Heterogeneous Population
+### 5.4 Homogeneous vs. Heterogeneous Population
 
 | Population    | Mean ($A$) | Std ($A$)    | Congestion rate |
 | ------------- | ------------ | -------------- | --------------- |
@@ -261,6 +272,23 @@ The welfare analysis (Section 2.3) quantifies the policy case: a mechanism direc
 ### 6.3 Model Limitations
 
 Heterogeneous travel costs would introduce agent-specific indifference thresholds; departure-time flexibility would expand the strategy space from binary to continuous; information asymmetry would stratify the predictor landscape, with informed agents systematically outperforming uninformed ones. These remain directions for future work.
+
+## 7. Extensions: Non-Stationary Environments
+
+The baseline model assumes a structurally static environment ($N=101$, $T=60$). Real-world urban infrastructure, however, is subject to exogenous shocks and periodic fluctuations. We substitute the baseline parameters with two dynamic settings to examine the robustness and counter-intuitive implications of boundedly rational adaptation.
+
+### 7.1 The "Weekend Effect": Congestion Despite Reduced Demand
+
+Commuting is heavily calendar-dependent. While it is mathematically obvious that reducing total commuters ($N$) will eventually clear congestion if $T$ remains constant, this ignores the corresponding shift in external options. Real-world weekends feature less traffic but also a drastic reduction in public transit frequency.
+
+**Simulation Setup:** We introduce a 7-day cyclical calendar.
+
+- **Weekdays (5 days):** Baseline parameters ($N=101$, $T=60$, $r_{\text{transit}} = 0.3$).
+- **Weekends (2 days):** The active commuter population drops by 25% to $N=75$. However, the payoff for alternative transport collapses to $r_{\text{transit}} = 0.05$ due to infrequent weekend schedules.
+
+**Expected Dynamics:** Because the transit payoff is heavily penalised on weekends, the mixed NE indifference threshold $p^*$ shifts drastically upward. Drivers will abandon public transport and flood the road network despite there being fewer people travelling overall.
+
+**Counter-Intuitive Finding:** The congestion rate (frequency of $A > T$) on weekends is expected to be strictly *higher* than on weekdays, despite a 25% reduction in total travellers. The adaptive ecology demonstrates that governing system congestion relies primarily on maintaining the *quality of the external alternative* ($r_{\text{transit}}$) rather than simply suppressing the absolute number of network participants ($N$).
 
 ---
 
