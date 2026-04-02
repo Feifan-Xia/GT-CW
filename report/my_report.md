@@ -12,7 +12,7 @@ We study the minority game in the context of urban commuting, where 101 workers 
 
 ### 1.1 Motivating Context
 
-Every weekday morning, $N=101$ workers decide independently whether to **drive** or use **alternative transport** (public transit). The road has a capacity $T=60$: when at most 60 cars use it, traffic flows freely; when more than 60 enter, all drivers experience congestion. This is a **minority game**: a driver benefits only by being in the minority who chose to drive. The minority-game structure distinguishes this from coordination games (where agents want to match others' choices) and motivates adaptive rather than equilibrium-based decision-making.
+Every weekday morning, $N=101$ workers decide independently whether to **drive** or use **alternative transport** (public transit). The road has a capacity $T=60$: when at most 60 cars use it, traffic flows freely; when more than 60 enter, all drivers experience congestion. This is a minority game (Challet & Zhang, 1997): a driver benefits only by being in the minority who chose to drive. The minority-game structure distinguishes this from coordination games (where agents want to match others' choices) and motivates adaptive rather than equilibrium-based decision-making.
 
 ### 1.2 Normal-Form Game
 
@@ -99,16 +99,12 @@ In real commuting terms: a city that can direct exactly 60 daily drivers through
 
 ### 3.1 Numerical Verification of $p^*$
 
-Running 1,000 independent single-shot games for each $p \in \{0.10, 0.15, \ldots, 0.90\}$ confirms the analytical prediction. **Figure 1(a)** shows $\mathbb{E}[r \mid \textit{drive}]$ declining from near 1 at low $p$ to near 0 at high $p$, crossing $r_{\text{transit}} = 0.3$ precisely at $p^* \approx 0.62$, matching the Brent-method solution. **Figure 1(b)** plots mean attendance across the same sweep, confirming $\mathbb{E}[A] = Np^* \approx 62.6$ at the crossing point.
+Running 1,000 independent single-shot games for each $p \in \{0.10, 0.15, \ldots, 0.90\}$ confirms the analytical prediction. **Figure 1(a)** plots mean attendance across the same sweep, confirming $\mathbb{E}[A] = Np^* \approx 62.6$ at the crossing point. **Figure 1(b)** shows $\mathbb{E}[r \mid \textit{drive}]$ declining from near 1 at low $p$ to near 0 at high $p$, crossing $r_{\text{transit}} = 0.3$ precisely at $p^* \approx 0.62$, matching the Brent-method solution.
 
 ![Figure 1](figure1_static_sweep.png)
-*Figure 1: (a) Indifference condition -- $\mathbb{E}[r \mid drive]$ crosses $r_\text{transit}=0.3$ at $p^*\approx 0.62$. (b) Mean attendance $\mathbb{E}[A]$ vs $p$ across the full sweep, with $T$ and $Np^*$ marked.*
-
-// ab 图交换位置
+*Figure 1: (a) Mean attendance $\mathbb{E}[A]$ vs $p$ across the full sweep, with $T$ and $Np^*$ marked. (b) Indifference condition -- $\mathbb{E}[r \mid drive]$ crosses $r_\text{transit}=0.3$ at $p^*\approx 0.62$.*
 
 ### 3.2 Attendance Distribution at $p^*$
-
-【把500run 向之前对齐到1000】
 
 **Figure 2** shows 1000 independent single-shot outcomes at $p = p^*$. The empirical mean is $62.55 \approx Np^* = 62.64$, empirical standard deviation $\sigma = 4.93$, and theoretical binomial standard deviation $\sqrt{Np^*(1-p^*)} = 4.88$, a near-perfect agreement validating simulation fidelity. Congestion ($A > T = 60$) occurs in **65.4%** of rounds.
 
@@ -134,11 +130,13 @@ Note that this constitutes a best response to the *previous* period's outcome, n
 ![Figure 3](figure3_best_response.png)
 *Figure 3: Stage-game best-reply -- permanent 0--101 oscillation. Mean payoff $= (0.3 + 0)/2 = 0.15$, below the transit-only payoff.*
 
-This is an **oscillatory anti-coordination regime**: homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff $0.15$, half of the payoff $0.30$ achieved by any fixed strategy such as always driving, always using transit, or randomising at $p^*$. The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle. The result also shows that the symmetric mixed NE at $p^* = 0.62$ is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
+This is an oscillatory anti-coordination regime. Homogeneity of strategies simultaneously coordinates overcrowding and complete avoidance, earning mean per-agent payoff 0.15, half of the payoff 0.30 achieved by any fixed strategy such as always driving, always using transit, or randomising at p*.
 
-For commuting applications: a navigation system that broadcasts a single uniform recommendation to all users would replicate this failure. Universal adoption of a single reactive rule on a heavily used road creates the oscillatory pattern qualitatively consistent with periodic flow waves observed on instrumented ring roads.
+The dynamic instability of symmetric pure NE (Section 2.1) manifests here as a limit cycle: all agents apply the same rule to the same public signal At−1 perpetually overshoot in both directions rather than settling at any fixed point. The result also shows that the symmetric mixed NE at p*=0.62 is not a dynamical attractor: no simple reactive rule applied uniformly by all agents converges to it.
 
-This motivates the inductive approach, where agents use heterogeneous predictors to achieve coordination near the threshold without requiring common knowledge or communication.
+This failure is not specific to Best-Reply: it applies to any homogeneous reactive rule. For commuting applications, a navigation system broadcasting a single uniform recommendation replicates this failure, and universal adoption of one reactive rule produces oscillatory flow waves qualitatively consistent with those observed on instrumented ring roads (Cabannes et al., 2018).
+
+This motivates the inductive approach: heterogeneous predictors break the synchronisation that homogeneous rules cannot escape.
 
 ### 4.2 Inductive Strategies
 
@@ -192,7 +190,7 @@ Convergence is not the result of agents computing $p^*$. Rather, the **compositi
 
 - Stage-game best-reply: $0.150$ (oscillatory anti-coordination regime)
 - Uncorrelated random play at $p^*$: $\approx 0.300$ (mixed NE, as expected from the indifference condition)
-- Inductive (mean across seeds 42, 123, 7): $\approx 0.306$
+- Inductive (mean ac ross seeds 42, 123, 7): $\approx 0.306$
 
 Individual seed payoffs are [0.294, 0.300, 0.323], with seed 42 being the only seed that falls marginally below the 0.300 benchmark. The cross-seed mean exceeds the benchmark; results are not uniformly above it. The principal advantage of inductive agents over uncorrelated random play is not the raw payoff difference -- which is small -- but the **reduced congestion rate** (46% vs 65%) and lower variance in individual outcomes.
 
@@ -252,19 +250,17 @@ Note that the homogeneous result depends on which six predictors are randomly dr
 
 ### 6.1 Endogenous Coordination Without Communication
 
-The inductive model shows that individual commuters, each independently applying a personal decision model, can produce near-threshold attendance without explicit communication or central authority. The mechanism is the **composition of active predictors**: predictors forecasting below $T$ attract more drivers, increasing attendance toward congestion and thereby penalising those predictors; predictors forecasting above $T$ then gain score, reducing driving the following round. This feedback cycle operates entirely through distributed score updates. The result is the core finding of Arthur (1994): bounded-rational induction can produce coordination outcomes without the common-knowledge assumptions required by equilibrium reasoning.
+The inductive model confirms Arthur's (1994) core finding: bounded-rational agents, each applying a personal predictor independently, produce near-threshold coordination without communication or central authority. The feedback mechanism is entirely distributed, as predictors forecasting below T attract more drivers, increasing congestion and penalising those predictors; predictors forecasting above T then gain score, reducing driving the following round.
 
 ### 6.2 Implications for Navigation Systems and Congestion Policy
 
-The homogeneous simulation represents a scenario in which all commuters receive recommendations from the same navigation algorithm: their predictor pools become effectively identical. The result (Figure 7, lower panel) is synchronised oscillation. This pattern has been observed qualitatively in urban networks where dominant navigation applications simultaneously reroute large volumes of traffic onto previously uncongested roads. The minority game provides the formal mechanism: a single shared predictor removes the distributional diversity that produces aggregate stability.
+The homogeneous simulation models universal adoption of a single navigation algorithm. The result, synchronised oscillation (Figure 7), provides the formal mechanism behind observed traffic waves when dominant apps simultaneously reroute large volumes. Predictor diversity is structurally necessary for stability.
 
 The welfare analysis (Section 2.3) quantifies the policy case: a mechanism directing exactly $T=60$ drivers each morning achieves per-agent welfare $0.716$ versus the mixed NE baseline of $0.300$, approximately doubling per-agent welfare and providing a quantifiable motivation for road pricing or permit-based rationing schemes.
 
-### 6.3 Predictor Richness and Model Limitations
+### 6.3 Model Limitations
 
-The novel predictors contribute approximately 6--15% payoff improvement (mainly through thresh-prox), consistent with Arthur's observation that no predictor is universally superior: the value of any predictor depends on what others are using. A thresh-prox predictor that performs well when rare becomes counterproductive if adopted universally, since coordinated mean-reversion would reproduce oscillation of its own.
-
-**Relaxing model assumptions.** Heterogeneous travel costs would introduce agent-specific indifference thresholds, shifting the effective $p^*$ and altering which predictors dominate in the stable predictor distribution. Departure-time flexibility would expand the strategy space from binary to continuous, transforming the problem into a scheduling game. Information asymmetry (some drivers with real-time feeds, others without) would produce a stratified predictor landscape, with informed agents systematically outperforming uninformed ones. These extensions remain directions for future work.
+Heterogeneous travel costs would introduce agent-specific indifference thresholds; departure-time flexibility would expand the strategy space from binary to continuous; information asymmetry would stratify the predictor landscape, with informed agents systematically outperforming uninformed ones. These remain directions for future work.
 
 ---
 
@@ -277,6 +273,10 @@ The minority game demonstrates the tension between individual rationality and co
 ## References
 
 Arthur, W. B. (1994). Inductive reasoning and bounded rationality. *American Economic Review*, 84(2), 406--411.
+
+Challet, D., & Zhang, Y. C. (1997). Emergence of cooperation and organization in an evolutionary game. *Physica A* , 246(3-4), 407-418.
+
+Cabannes, T., Vincentelli, M. A. S., Sundt, A., Signargout, H., Porter, E., & Bayen, A. M. (2018). The impact of GPS-enabled shortest path routing on mobility: a game theoretic approach. *Transportation Research Part B* , 117, 486--504.
 
 ---
 
