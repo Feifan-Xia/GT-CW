@@ -1,0 +1,200 @@
+% QUICK REFERENCE: LaTeX 格式规范速记
+
+% ============================================
+% DO's (✅ 做这些)
+% ============================================
+
+% 1. 段落结尾加 \\
+Paragraph text here. \\
+
+% 2. 用 \section 和 \subsection (不写数字)
+\section{Main Topic}
+\subsection{Sub Topic}
+
+% 3. 窄图用 figure[H] + \columnwidth
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{image.png}
+\caption{Description without "Figure X: " prefix}
+\label{fig:label}
+\end{figure}
+
+% 4. 宽图用 figure*[t] + 0.8\textwidth
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{wide_image.png}
+\caption{wide figure description}
+\label{fig:wide}
+\end{figure*}
+
+% 5. 表格用 \resizebox 自适应列宽
+\begin{table}[H]
+\centering
+\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcc}
+\toprule
+... & ... & ... \\
+\bottomrule
+\end{tabular}%
+}
+\caption{table description (no "Table X:" prefix)}
+\label{tab:label}
+\end{table}
+
+% 6. 列表不加 \\
+\begin{itemize}
+    \item First item
+    \item Second item
+\end{itemize}
+
+% 7. 列表后的段落加 \\
+Next paragraph after list. \\
+
+% ============================================
+% DON'Ts (❌ 不要这些)
+% ============================================
+
+% ❌ 不要在标题中写数字
+\section{1. Introduction}  % WRONG!
+\section{Introduction}     % CORRECT
+
+% ❌ 不要在图题中写 "Figure X: "
+\caption{Figure 1: My description}      % WRONG!
+\caption{My description}                % CORRECT
+
+% ❌ 不要在表题中写 "Table Y: "
+\caption{Table 2: Results}              % WRONG!
+\caption{Results}                       % CORRECT
+
+% ❌ 不要忘记段尾 \\
+This is a paragraph.
+Next paragraph.           % WRONG - missing \\
+
+This is a paragraph. \\
+Next paragraph. \\        % CORRECT
+
+% ❌ 不要多张双列图放同一页
+\begin{figure*}[t]...\end{figure*}
+\begin{figure*}[t]...\end{figure*}  % WRONG - max 1 per page!
+
+% ❌ 不要用 figure[H] 放宽图
+\begin{figure}[H]
+\includegraphics[width=0.9\textwidth]{...}  % WRONG - use figure*[t]
+\end{figure}
+
+% ❌ 不要让表格溢出列外
+\begin{tabular}{...}...  % WRONG - will overflow!
+\resizebox{\columnwidth}{!}{\begin{tabular}{...}…}  % CORRECT
+
+% ❌ 不要在列表项加 \\
+\begin{itemize}
+    \item Item one \\     % WRONG!
+    \item Item two \\     % WRONG!
+\end{itemize}
+
+% ============================================
+% LAYOUT RULES (布局规则)
+% ============================================
+
+% Rule 1: 每页最多 1 张双列图
+% Page layout:
+%  ┌─────────────────────┐
+%  │ [双列图 Figure 3]   │  ← 占 1/3-1/2 页
+%  ├─────────────────────┤
+%  │ 正文继续...       │
+%  │ ... \\            │
+%  └─────────────────────┘
+
+% Rule 2: 单列图可多张/页
+% Page layout:
+%  ┌──────────┬──────────┐
+%  │[Fig 1]   │[Fig 2]   │
+%  ├──────────┼──────────┤
+%  │ 表格 [Table 1]    │
+%  │          │          │
+%  └──────────┴──────────┘
+
+% Rule 3: 图表溢出防护
+% 单列表：\resizebox{\columnwidth}{!}{...}
+% 双列表：\resizebox{0.8\textwidth}{!}{...}
+
+% ============================================
+% NUMBERING CONFIGURATION (编号配置)
+% ============================================
+
+% 自动编号由此配置激活（文件头部）：
+\setcounter{secnumdepth}{2}
+%
+% Result:
+% \section{...}      → "1. Section Name"
+% \subsection{...}   → "1.1 Subsection Name"
+% \subsubsection{...} → (disabled, count not shown)
+
+% ============================================
+% FIGURE/TABLE WIDTH REFERENCE (图表宽度参考)
+% ============================================
+
+% 宽度选择流程：
+%
+% 是否 > 5 英寸（或内容很宽）？
+%   |
+%   YES → \begin{figure*}[t]
+%         \includegraphics[width=0.8\textwidth]{...}
+%         注意: 每页最多 1 张
+%   |
+%   NO  → \begin{figure}[H]
+%         \includegraphics[width=\columnwidth]{...}
+%         可多张同页
+
+% 表格：
+%   \resizebox{\columnwidth}{!}{%
+%     \begin{tabular}{...}...\end{tabular}%
+%   }
+%   or
+%   \resizebox{0.8\textwidth}{!}{...}  (for wide tables)
+
+% ============================================
+% 常用命令速查 (CHEAT SHEET)
+% ============================================
+
+% 段落分隔
+... text here. \\
+
+% 粗体和斜体
+\textbf{bold}    \textit{italic}
+
+% 数学模式
+$x = y$              (inline)
+\begin{equation}
+x = y
+\end{equation}       (display)
+
+% 列表
+\begin{itemize}
+    \item point 1
+    \item point 2
+\end{itemize}
+
+% 加粗文字 + 冒号
+\textbf{Key point:} description \\
+
+% 超链接
+\href{https://example.com}{link text}
+
+% 脚注
+Some text\footnote{This is a footnote}
+
+% 引用
+As shown in Figure \ref{fig:label}...
+See Table \ref{tab:label}...
+
+% ============================================
+% VERSION INFO
+% ============================================
+
+% 文件: report_v2.tex (v2.1)
+% 完成日期: 2026-04-03
+% 标准: AAAI 2023 (修订)
+% 快速参考卡片: 2026-04-03
+
