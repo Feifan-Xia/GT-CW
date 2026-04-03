@@ -530,5 +530,48 @@ The 100-seed average reveals that weekend congestion is \textbf{substantially lo
 The minority game demonstrates the tension between individual rationality and collective efficiency in urban commuting. The unique symmetric mixed NE ($p^* \approx 0.62$) produces congestion 68.4\% of the time and achieves per-agent welfare of $0.300$, identical to universal transit use and 2.4 times below the social optimum. Stage-game best-reply dynamics produce an oscillatory anti-coordination regime yielding the worst achievable payoff and confirm that the mixed NE is not a dynamical attractor. Inductive agents following Arthur (1994), with heterogeneous predictor pools, stabilise near $T=60$ within 30 rounds, reduce congestion to approximately 46.9\%, and achieve mean payoff $0.307 \pm 0.015$ across 100 seeds -- marginally above the mixed NE benchmark. Ablation experiments show that thresh-prox accounts for most of the novel predictors' contribution (approximately 5\% payoff improvement) while cong-mom's marginal effect is small; exploration contributes an average 8.5\% payoff gain over pure exploitation. The homogeneous population experiment confirms that predictor diversity is structurally necessary for stability. The central finding for commuting infrastructure and recommendation system design is that \textbf{diversity of strategies among users, rather than sophistication of any individual strategy, produces collective near-optimality.} \\
 
 \newpage
+\section*{References}
 
+Arthur, W. B. (1994). Inductive reasoning and bounded rationality. \textit{American Economic Review}, \textbf{84}(2), 406--411. \\
+
+Cabannes, T., Vincentelli, M. A. S., Sundt, A., Signargout, H., Porter, E., \& Bayen, A. M. (2018). The impact of GPS-enabled shortest path routing on mobility: a game theoretic approach. \textit{Transportation Research Part B}, \textbf{117}, 486--504. \\
+
+Challet, D., \& Zhang, Y. C. (1997). Emergence of cooperation and organization in an evolutionary game. \textit{Physica A}, \textbf{246}(3-4), 407--418. \\
+
+Tversky, A., \& Kahneman, D. (1974). Judgment under uncertainty: Heuristics and biases. \textit{Science}, 185(4157), 1124--1131. \\
+
+Nerlove, M. (1958). Adaptive expectations and cobweb phenomena. \textit{Quarterly Journal of Economics}, 72(2), 227--240. \\
+
+
+\section*{Appendix: Contribution Statement}
+This study received research support from GitHub Copilot (Claude Haiku 4.5) for literature research, code debugging, visualization, and report clarity. All theoretical arguments, simulation parameters, experimental designs, and conclusions were developed independently.
+
+\begin{table*}[b]
+\centering
+\small
+\begin{tabular}{|p{12cm}|c|c|}
+\hline
+\textbf{Component} & \textbf{Feifan Xia} & \textbf{Yipeng Zhou} \\
+\hline
+Definition of the game & $50\%$ & $50\%$ \\
+\hline
+Theoretical analysis & $60\%$ & $40\%$ \\
+\hline
+Implementation and simulation of the static game version & $50\%$ & $50\%$ \\
+\hline
+Implementation and simulation of the repeated game version & $30\%$ & $70\%$ \\
+\hline
+Proposal of inductive strategies & $40\%$ & $60\%$ \\
+\hline
+Implementation and simulation of outcomes based on various inductive strategies & $70\%$ & $30\%$ \\
+\hline
+Analysis of simulation outcomes (for all simulations) & $60\%$ & $40\%$ \\
+\hline
+A minority game in the real-world & $40\%$ & $60\%$ \\
+\hline
+Report writing & $50\%$ & $50\%$ \\
+\hline
+\end{tabular}
+\caption{Contribution breakdown by student and component.}
+\end{table*}\\
 \end{document}
