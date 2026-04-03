@@ -33,7 +33,7 @@ GAMMA   = 0.9     # predictor score decay
 DELTA   = 5       # accuracy tolerance window
 K       = 6       # predictors per agent
 WARMUP  = 10      # warmup rounds to seed history (not counted in output)
-SEEDS   = [42, 123, 7]
+SEEDS   = list(range(100))  # 100 random seeds
 
 # Colour palette
 COL_T   = '#e74c3c'
@@ -44,7 +44,7 @@ COL_RND = '#e67e22'
 COL_HOM = '#e74c3c'
 COL_HET = '#27ae60'
 
-OUT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'report')
 
 PREDICTOR_NAMES = [
     "last", "avg3", "avg5", "avg7",
@@ -107,30 +107,30 @@ def simulate_static(p_star, rng):
     # ---- Figure 1 ----
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.2))
 
-    ax1.plot(p_values, mean_r_go, 'o-', color=COL_IND, lw=2, ms=5,
-             label=r'$\mathbb{E}[r \mid go]$')
-    ax1.axhline(R_STAY, color='gray', ls='--', lw=1.5,
-                label=f'$r_{{\\mathrm{{stay}}}}={R_STAY}$')
+    ax1.plot(p_values, mean_attend, 's-', color=COL_BR, lw=2, ms=5,
+             label=r'$\mathbb{E}[A]$')
+    ax1.axhline(T, color=COL_T, ls='--', lw=1.5, label=f'$T={T}$')
     ax1.axvline(p_star, color=COL_T, ls=':', lw=2,
                 label=f'$p^*={p_star:.3f}$')
+    ax1.axhline(N * p_star, color=COL_NP, ls='--', lw=1.5,
+                label=f'$Np^*\\approx{N*p_star:.1f}$')
     ax1.set_xlabel('Probability of going, $p$', fontsize=11)
-    ax1.set_ylabel('Expected payoff of going', fontsize=11)
-    ax1.set_title('(a) Indifference condition: locating $p^*$', fontsize=11)
+    ax1.set_ylabel('Mean attendance $\\mathbb{E}[A]$', fontsize=11)
+    ax1.set_title('(a) Mean attendance vs. $p$', fontsize=11)
     ax1.legend(fontsize=9); ax1.set_xlim(0.05, 0.95); ax1.grid(alpha=0.3)
 
-    ax2.plot(p_values, mean_attend, 's-', color=COL_BR, lw=2, ms=5,
-             label=r'$\mathbb{E}[A]$')
-    ax2.axhline(T, color=COL_T, ls='--', lw=1.5, label=f'$T={T}$')
+    ax2.plot(p_values, mean_r_go, 'o-', color=COL_IND, lw=2, ms=5,
+             label=r'$\mathbb{E}[r \mid go]$')
+    ax2.axhline(R_STAY, color='gray', ls='--', lw=1.5,
+                label=f'$r_{{\\mathrm{{stay}}}}={R_STAY}$')
     ax2.axvline(p_star, color=COL_T, ls=':', lw=2,
                 label=f'$p^*={p_star:.3f}$')
-    ax2.axhline(N * p_star, color=COL_NP, ls='--', lw=1.5,
-                label=f'$Np^*\\approx{N*p_star:.1f}$')
     ax2.set_xlabel('Probability of going, $p$', fontsize=11)
-    ax2.set_ylabel('Mean attendance $\\mathbb{E}[A]$', fontsize=11)
-    ax2.set_title('(b) Mean attendance vs. $p$', fontsize=11)
+    ax2.set_ylabel('Expected payoff of going', fontsize=11)
+    ax2.set_title('(b) Indifference condition: locating $p^*$', fontsize=11)
     ax2.legend(fontsize=9); ax2.set_xlim(0.05, 0.95); ax2.grid(alpha=0.3)
 
-    fig.suptitle('Figure 1: Static game sweep', fontsize=12, fontweight='bold')
+    fig.suptitle('Static game sweep', fontsize=12, fontweight='bold')
     plt.tight_layout()
     fig.savefig(os.path.join(OUT_DIR, 'figure1_static_sweep.png'),
                 dpi=150, bbox_inches='tight')
@@ -156,7 +156,7 @@ def simulate_static(p_star, rng):
     ax.set_xlabel('Attendance $A$', fontsize=11)
     ax.set_ylabel('Frequency', fontsize=11)
     ax.set_title(
-        f'Figure 2: Attendance at $p^*$ — congested in {congested_frac:.0%} of rounds',
+        f'Attendance at p*: congested in {congested_frac:.0%} of rounds',
         fontsize=11, fontweight='bold')
     ax.legend(fontsize=9); ax.grid(alpha=0.3)
     plt.tight_layout()
@@ -197,7 +197,7 @@ def plot_best_reply(history, p_star):
     ax.set_xlabel('Round $t$', fontsize=11)
     ax.set_ylabel('Attendance $A_t$', fontsize=11)
     ax.set_title(
-        'Figure 3: Myopic best-reply dynamics — anti-coordination oscillation',
+        'Myopic best-reply: anti-coordination oscillation',
         fontsize=11, fontweight='bold')
     ax.legend(fontsize=9)
     ax.set_xlim(0, M); ax.set_ylim(-5, N + 5); ax.grid(alpha=0.3)
@@ -379,7 +379,7 @@ def plot_inductive_attendance(attendance, p_star, window=10):
                label=f'$Np^*={N*p_star:.1f}$')
     ax.set_xlabel('Round $t$', fontsize=11)
     ax.set_ylabel('Attendance $A_t$', fontsize=11)
-    ax.set_title('Figure 4: Inductive agents — emergence of self-regulation near $T$',
+    ax.set_title('Inductive agents: self-regulation near T',
                  fontsize=11, fontweight='bold')
     ax.legend(fontsize=9); ax.set_xlim(0, M); ax.grid(alpha=0.3)
     plt.tight_layout()
@@ -401,26 +401,39 @@ def plot_predictor_ecology(active_preds):
     fracs_s = np.apply_along_axis(
         lambda x: np.convolve(x, np.ones(w) / w, mode='same'), 0, fracs)
 
-    cmap   = plt.colormaps.get_cmap('tab20')
-    colors = [cmap(i / N_PREDICTORS) for i in range(N_PREDICTORS)]
+    # Custom color palette to match reference design
+    colors = [
+        '#1f77b4',  # last (blue)
+        '#aec7e8',  # avg3 (light blue)
+        '#ff7f0e',  # avg5 (orange)
+        '#8c6239',  # contrarian (brown)
+        '#8b8680',  # cong_mom (gray-brown)
+        '#7f7f7f',  # cycle2 (gray)
+        '#2ca02c',  # avg7 (green)
+        '#ffb3ba',  # trend (light pink)
+        '#d62728',  # thresh_prox (red-pink)
+        '#17becf',  # cycle3 (cyan)
+        '#ffdd57'   # cycle5 (yellow)
+    ]
 
     fig, ax = plt.subplots(figsize=(11, 4.5))
     bottoms = np.zeros(M)
     for pidx in range(N_PREDICTORS):
         ax.fill_between(range(M), bottoms, bottoms + fracs_s[:, pidx],
-                        color=colors[pidx], alpha=0.85,
+                        color=colors[pidx], alpha=0.75,
                         label=PREDICTOR_NAMES[pidx])
         bottoms += fracs_s[:, pidx]
 
     ax.set_xlabel('Round $t$', fontsize=11)
     ax.set_ylabel('Fraction of agents', fontsize=11)
-    ax.set_title('Figure 5: Predictor ecology over time',
+    ax.set_title('Active predictor composition over time',
                  fontsize=11, fontweight='bold')
     ax.legend(fontsize=8, ncol=6, loc='upper center',
               bbox_to_anchor=(0.5, -0.18), frameon=False)
     ax.set_xlim(0, M); ax.set_ylim(0, 1); ax.grid(alpha=0.2)
     plt.tight_layout()
-    fig.savefig(os.path.join(OUT_DIR, 'figure5_predictor_ecology.png'),
+    report_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'report')
+    fig.savefig(os.path.join(report_dir, 'figure5_predictor_ecology.png'),
                 dpi=150, bbox_inches='tight')
     plt.close(fig)
     print("[Module 4] Figure 5 saved.")
@@ -459,7 +472,7 @@ def plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star):
                label=f'$r_{{\\mathrm{{stay}}}}={R_STAY}$')
     ax.set_xlabel('Round $t$', fontsize=11)
     ax.set_ylabel('Cumulative avg. payoff', fontsize=11)
-    ax.set_title('Figure 6: Payoff comparison', fontsize=11, fontweight='bold')
+    ax.set_title('Payoff comparison', fontsize=11, fontweight='bold')
     ax.legend(fontsize=9); ax.set_xlim(0, M); ax.grid(alpha=0.3)
     plt.tight_layout()
     fig.savefig(os.path.join(OUT_DIR, 'figure6_payoff_comparison.png'),
@@ -492,7 +505,7 @@ def plot_homo_hetero(att_het, att_hom, p_star, window=10):
 
     axes[-1].set_xlabel('Round $t$', fontsize=11)
     axes[-1].set_xlim(0, M)
-    fig.suptitle('Figure 7: Heterogeneous vs Homogeneous population dynamics',
+    fig.suptitle('Heterogeneous vs Homogeneous: population dynamics',
                  fontsize=12, fontweight='bold')
     plt.tight_layout()
     fig.savefig(os.path.join(OUT_DIR, 'figure7_homo_hetero.png'),

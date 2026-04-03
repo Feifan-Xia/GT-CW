@@ -22,7 +22,7 @@ GAMMA   = 0.9     # predictor score decay factor
 DELTA   = 5       # accuracy tolerance window for score update
 K       = 6       # predictors assigned to each agent
 WARMUP  = 10      # warm-up rounds to seed history (excluded from output)
-SEEDS   = [42, 123, 7]
+SEEDS   = list(range(100))
 
 # ---------------------------------------------------------------------------
 # Colour palette
