@@ -21,6 +21,7 @@ from minority_game import (
     compute_individual_payoffs,
     plot_inductive_attendance,
     plot_predictor_ecology,
+    plot_individual_payoff_boxplot,
     plot_cumulative_payoff,
     plot_homo_hetero,
     run_random_pstar,
@@ -48,8 +49,8 @@ def main():
     # ------------------------------------------------------------------
     # Module 3: stage-game best-reply (Figure 3)
     # ------------------------------------------------------------------
-    att_br = run_best_reply()
-    plot_best_reply(att_br, p_star)
+    att_br, dec_br = run_best_reply()
+    plot_best_reply(att_br, dec_br, p_star)
     br_payoff = np.mean(_mean_population_payoff(att_br))
     print(f"[BestReply] mean={np.mean(att_br):.1f}, "
           f"std={np.std(att_br):.1f}, "
@@ -83,9 +84,37 @@ def main():
     plot_inductive_attendance(att_ind, p_star)
     plot_predictor_ecology(active_preds)
 
-    # Figure 6: 3-seed mean +/- 1sigma
-    rng_rnd = np.random.default_rng(SEEDS[0] + 99)
-    att_rnd = run_random_pstar(p_star, rng_rnd)
+    # Figure 6: Individual payoff distribution box plot (3-population comparison)
+    # Aggregate all 100 seeds for Stationary
+    payoffs_stationary_all = []
+    for s in SEEDS:
+        rng_s = np.random.default_rng(s)
+        att_s, dec_s = run_random_pstar(p_star, rng_s)
+        payoffs_s = compute_individual_payoffs(att_s, dec_s)
+        payoffs_stationary_all.extend(payoffs_s)
+    payoffs_stationary_all = np.array(payoffs_stationary_all)
+    
+    # Keep seed 0 Stationary for Figure 7
+    rng_rnd = np.random.default_rng(SEEDS[0])
+    att_rnd, _ = run_random_pstar(p_star, rng_rnd)
+    
+    # Myopic is deterministic
+    payoffs_myopic = compute_individual_payoffs(att_br, dec_br)
+    
+    # Aggregate all 100 seeds for Inductive
+    payoffs_inductive_all = []
+    for s_idx in range(len(SEEDS)):
+        payoffs_ind_s = compute_individual_payoffs(att_ind_list[s_idx], dl_list[s_idx])
+        payoffs_inductive_all.extend(payoffs_ind_s)
+    payoffs_inductive_all = np.array(payoffs_inductive_all)
+    
+    plot_individual_payoff_boxplot(payoffs_stationary_all,
+                                     payoffs_myopic,
+                                     payoffs_inductive_all,
+                                     n_seed_stationary=len(SEEDS),
+                                     n_seed_inductive=len(SEEDS))
+
+    # Figure 7: Cumulative payoff comparison (3-seed mean +/- 1sigma)
     plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star)
 
     # Individual payoff heterogeneity (seed 42)

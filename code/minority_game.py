@@ -176,21 +176,26 @@ def run_best_reply():
     Homogeneous myopic best-reply population.
     Rule: go if last_A <= T (road was uncongested last round), else stay.
     Initialisation: last_A = T (uncongested), so all go in round 1.
+    Returns: attendance (M,), decisions_log (M, N)
     """
     last_A = T        # initial perceived attendance: uncongested
-    history = []
+    attendance = []
+    decisions_log = []
     for _ in range(M):
         decision = 1 if last_A <= T else 0
         A = N * decision     # all agents identical → all same choice
-        history.append(A)
+        attendance.append(A)
+        # All N agents make the same decision
+        decisions = np.full(N, decision, dtype=int)
+        decisions_log.append(decisions)
         last_A = A
-    return np.array(history)
+    return np.array(attendance), np.array(decisions_log)
 
 
-def plot_best_reply(history, p_star):
+def plot_best_reply(attendance, decisions_log, p_star):
     """Figure 3."""
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(history, color=COL_BR, lw=1.5, label='Attendance $A_t$')
+    ax.plot(attendance, color=COL_BR, lw=1.5, label='Attendance $A_t$')
     ax.axhline(T, color=COL_T, ls='--', lw=1.8, label=f'$T={T}$')
     ax.axhline(N * p_star, color=COL_NP, ls='--', lw=1.8,
                label=f'$Np^*={N*p_star:.1f}$')
@@ -455,30 +460,90 @@ def _mean_population_payoff(attendance):
 
 
 def run_random_pstar(p_star, rng):
-    return np.array([int((rng.random(N) < p_star).sum()) for _ in range(M)])
+    """Run stationary p* play and return attendance + decisions log."""
+    attendance = []
+    decisions_log = []
+    for _ in range(M):
+        decisions = (rng.random(N) < p_star).astype(int)
+        A = int(decisions.sum())
+        attendance.append(A)
+        decisions_log.append(decisions)
+    return np.array(attendance), np.array(decisions_log)
+
+
+def plot_individual_payoff_boxplot(payoff_stationary, payoff_myopic, payoff_inductive, 
+                                     n_seed_stationary=1, n_seed_inductive=1):
+    """Figure 6: Payoff distribution box plot comparing three populations across multiple seeds."""
+    
+    fig, ax = plt.subplots(figsize=(8.5, 5))
+    
+    # Prepare data for box plot
+    data = [payoff_stationary, payoff_myopic, payoff_inductive]
+    labels = [
+        f'Stationary\n($p^*$)\nN_seed={n_seed_stationary}',
+        'Myopic\nreactive\n(deterministic)',
+        f'Inductive\nN_seed={n_seed_inductive}'
+    ]
+    
+    # Colors matching Figure 7
+    box_colors = [COL_RND, COL_BR, COL_IND]
+    
+    bp = ax.boxplot(data, labels=labels, patch_artist=True,
+                    widths=0.6,
+                    medianprops=dict(color='black', linewidth=1.5),
+                    whiskerprops=dict(linewidth=1.5, color='black'),
+                    capprops=dict(linewidth=1.5, color='black'))
+    
+    # Explicitly set box colors
+    for patch, color in zip(bp['boxes'], box_colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+        patch.set_edgecolor('black')
+        patch.set_linewidth(1.5)
+    
+    ax.set_ylabel('Individual payoff', fontsize=11)
+    ax.set_xlabel('Population', fontsize=11)
+    ax.set_title('Individual payoff distribution across three regimes', 
+                 fontsize=12, fontweight='bold')
+    ax.grid(alpha=0.3, axis='y')
+    ax.set_ylim(0.1, 0.5)
+    
+    # Add mean markers
+    means = [payoff_stationary.mean(), payoff_myopic.mean(), payoff_inductive.mean()]
+    for i, mean in enumerate(means, 1):
+        ax.plot(i, mean, 'D', color='black', markersize=7, zorder=3)
+    
+    plt.tight_layout()
+    fig.savefig(os.path.join(OUT_DIR, 'figure6_individual_payoffs_boxplot.png'),
+                dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print("[Module 4] Figure 6 (Individual payoffs box plot) saved.")
+
 
 
 def plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star):
-    """Figure 6."""
+    """Figure 7."""
     def cum_avg(att):
         return np.cumsum(_mean_population_payoff(att)) / (np.arange(M) + 1)
 
     fig, ax = plt.subplots(figsize=(10, 4.2))
-    ax.plot(cum_avg(att_br),  color=COL_BR,  lw=2, label='Myopic best-reply')
     ax.plot(cum_avg(att_rnd), color=COL_RND, lw=2,
-            label=f'Random $p^*={p_star:.3f}$')
-    ax.plot(cum_avg(att_ind), color=COL_IND, lw=2, label='Inductive')
+            label='Stationary mixed-strategy play ($p^*$)')
+    ax.plot(cum_avg(att_br), color=COL_BR, lw=2, 
+            label='Repeated game version (myopic reactive agents)')
+    ax.plot(cum_avg(att_ind), color=COL_IND, lw=2, 
+            label='Inductive (mean across 100 seeds)')
     ax.axhline(R_STAY, color='gray', ls=':', lw=1.2,
                label=f'$r_{{\\mathrm{{stay}}}}={R_STAY}$')
     ax.set_xlabel('Round $t$', fontsize=11)
-    ax.set_ylabel('Cumulative avg. payoff', fontsize=11)
-    ax.set_title('Payoff comparison', fontsize=11, fontweight='bold')
+    ax.set_ylabel('Cumulative average payoff', fontsize=11)
+    ax.set_title('Cumulative average payoff comparison across three regimes', fontsize=11, fontweight='bold')
     ax.legend(fontsize=9); ax.set_xlim(0, M); ax.grid(alpha=0.3)
     plt.tight_layout()
-    fig.savefig(os.path.join(OUT_DIR, 'figure6_payoff_comparison.png'),
+    fig.savefig(os.path.join(OUT_DIR, 'figure7_payoff_comparison.png'),
                 dpi=150, bbox_inches='tight')
     plt.close(fig)
-    print("[Module 4] Figure 6 saved.")
+    print("[Module 4] Figure 7 saved.")
 
 
 # =============================================================================
@@ -486,7 +551,7 @@ def plot_cumulative_payoff(att_br, att_rnd, att_ind, p_star):
 # =============================================================================
 
 def plot_homo_hetero(att_het, att_hom, p_star, window=10):
-    """Figure 7."""
+    """Figure 8."""
     fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
     for ax, (att, col, label) in zip(axes, [
         (att_het, COL_HET, 'Heterogeneous (random predictor assignment)'),
@@ -508,10 +573,10 @@ def plot_homo_hetero(att_het, att_hom, p_star, window=10):
     fig.suptitle('Heterogeneous vs Homogeneous: population dynamics',
                  fontsize=12, fontweight='bold')
     plt.tight_layout()
-    fig.savefig(os.path.join(OUT_DIR, 'figure7_homo_hetero.png'),
+    fig.savefig(os.path.join(OUT_DIR, 'figure8_homo_hetero.png'),
                 dpi=150, bbox_inches='tight')
     plt.close(fig)
-    print("[Module 5] Figure 7 saved.")
+    print("[Module 5] Figure 8 saved.")
 
 
 # =============================================================================

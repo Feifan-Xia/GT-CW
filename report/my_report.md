@@ -183,6 +183,14 @@ We now simulate this heterogeneous population across 100 random seeds to evaluat
 ![Figure 4](figure4_inductive_attendance.png)
 *Figure 4: Inductive agents -- attendance stabilises near but below $T=60$, well below $Np^*$, within approximately 30 rounds.*
 
+| Population                          | Mean attendance | Congestion rate | Mean payoff |
+| ----------------------------------- | --------------- | --------------- | ----------- |
+| Stationary mixed-strategy play (p*) | 62.6            | 68.4%           | 0.300       |
+| Myopic reactive agents              | 50.5            | 50.0%           | 0.150       |
+| Inductive (mean across 100 seeds)   | 56.7            | 46.5%           | 0.307       |
+
+*Table 3: Congestion rate comparison across three regimes. The principal advantage of inductive agents is not payoff (0.307 vs. 0.300 for stationary play) but substantially reduced congestion (46.5% vs. 68.4%), delivering near-equilibrium coordination with lower traffic volatility.*
+
 Convergence is not the result of agents computing $p^*$. Rather, the **composition of active predictors** determines the aggregate drive fraction: those directing agents to drive win score points when attendance is below $T$, increasing $A$ toward $T$; once above $T$, predictors directing agents to transit win points, lowering $A$ again. The mean drive fraction in steady state is approximately $\bar{A}/N \approx 55\%$, which is slightly below $T/N \approx 59\%$, consistent with the mean attendance being slightly below $T$.
 
 **Predictor composition (Figure 5).** The active predictor distribution shifts over time: avg-7 and thresh-prox dominate in the converged steady state (each approximately 23% share), with cycle-2 at 13%, reflecting the residual short-period oscillations visible in Figure 4. The trend predictor is eliminated (0% share) as it systematically overestimates momentum and is outcompeted across all history conditions. The novel thresh-prox achieves 23% steady-state share, confirming its relevance in the commuting setting; cong-mom reaches only 3%, consistent with its narrower calibration advantage (Section 4.2).
@@ -200,10 +208,21 @@ The convergence behaviour established above achieves a steady-state payoff outco
 
 Across 100 random seeds, the mean payoff is 0.307 (std = 0.015). The cross-seed mean exceeds the benchmark, consistently reflecting a robust outcome. The principal advantage of inductive agents over stationary mixed-strategy play is not the raw payoff difference, which is small, but the **reduced congestion rate** (47% vs 68.4%) and lower variance in individual outcomes.
 
-![Figure 6](figure6_payoff_comparison.png)
-*Figure 6: Cumulative payoff -- inductive (mean $\pm 1\sigma$ across 100 seeds) vs stationary $p^*$ vs myopic reactive.*
+![Figure 7](figure7_payoff_comparison.png)
+*Figure 7: Cumulative payoff -- inductive (mean $\pm 1\sigma$ across 100 seeds) vs stationary $p^*$ vs myopic reactive.*
 
-**Conclusion.** Heterogeneous inductive predictors resolve myopic reactivity's synchronisation failure, achieving near-equilibrium payoff (0.307) with substantially lower congestion (47% versus 68.4%) across 100 robust realisations. The mechanism is transparent: predictor competition under accuracy selection shifts active forecasts (avg-7 and thresh-prox dominant with 23% each), creating a self-correcting dynamic that stabilises demand without central coordination. Within-population inequality (37% payoff spread) reflects heterogeneous predictor assignment, consistent with empirical commuting populations.
+### 4.5 Individual Payoff Heterogeneity
+
+Per-agent payoffs exhibit substantial within-population inequality. **Figure 6** presents the distribution of individual steady-state payoffs (last 50 rounds) across agents in a representative seed, shown as a box plot to highlight quartiles, median, and outliers.
+
+![Figure 6](figure6_individual_payoffs_boxplot.png)
+*Figure 6: Individual payoff distribution across agents (box plot): 37% spread between best and worst performers reflects heterogeneous predictor assignment.*
+
+Agents randomly assigned higher-performing predictors (particularly thresh-prox and avg-7) consistently earn more. The 37% spread between best and worst agents is an emergent consequence of random predictor assignment, distinct from the egalitarian symmetric NE where all players are treated identically. However, this heterogeneous inequality is consistent with empirical commuting populations where travellers possess different information sets and prediction heuristics.
+
+#### Summary of Section 4
+
+Heterogeneous inductive predictors resolve myopic reactivity's synchronisation failure, achieving near-equilibrium payoff (0.307) with substantially lower congestion (47% versus 68.4%) across 100 robust realisations. The mechanism is transparent: predictor competition under accuracy selection shifts active forecasts (avg-7 and thresh-prox dominant with 23% each), creating a self-correcting dynamic that stabilises demand without central coordination. Within-population inequality (37% payoff spread) reflects heterogeneous predictor assignment, consistent with empirical commuting populations.
 
 ---
 
